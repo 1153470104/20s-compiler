@@ -8,7 +8,8 @@ public class Num extends Token {
         value = v;
     }
     
-    public String tosString() {
-        return "" + value;
+    //the wierdest bug i've ever meet before, i misspell toString ...
+    public String toString() {
+        return "int, " + value;
     }
 }

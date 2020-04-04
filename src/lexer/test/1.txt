@@ -1,1 +1,2 @@
-position  =   initial  +   rate  *    60     ;
+position  =   initial  +   rate  *    60.1 * 60     ;
+if(true){} else if (false){} else {}

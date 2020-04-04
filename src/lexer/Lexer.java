@@ -2,14 +2,18 @@ package lexer;
 
 import java.io.*;
 import java.util.*;
+
 import symbol.*;
 
 public class Lexer {
     public static int line = 1;
-    char peek;
+    //最开始的地方老是会返回一个空token，发现原来是因为本来的peek 没有值，
+    //导致系统不做任何跳过就直接导出一个token了。。所以还是要设为 ' ',才对
+    char peek = ' ';
     Hashtable words = new Hashtable<>();
     List<Token> tokens = new LinkedList<>();
     String filename;
+    //judge if it's the end of the reader
     private static int judgeEnd = 0;
     
     /**store word in words */
@@ -22,7 +26,11 @@ public class Lexer {
      */
     public void tokenPrint() {
         for(Token t: tokens) {
-            System.out.println("< " + (char)t.tag + ", " + t + " >");
+            if(t.tag < 256) {
+                System.out.println("< " + (char)t.tag + " >");
+            } else {
+            System.out.println("< " + t + " >");
+            }
         }
     }
     
@@ -33,6 +41,8 @@ public class Lexer {
         reserve(new Word("while", Tag.WHILE));
         reserve(new Word("do", Tag.DO));
         reserve(new Word("break", Tag.BREAK));
+        reserve(new Word("return", Tag.RETURN));
+
         reserve(Word.True);
         reserve(Word.False);
         reserve(Type.Char);
@@ -47,10 +57,13 @@ public class Lexer {
             Reader reader = new InputStreamReader(new FileInputStream(file));
             do {
                 tok = scan(reader);
-                tokens.add(tok);
+                //System.out.println("tok: " + tok);
+                if(tok != null) 
+                    tokens.add(tok);
             }
             while(judgeEnd == 0);
             tokens.remove(tok);
+            reader.close();
             
         } catch (IOException e) {
             System.out.println("file read error.");
@@ -76,6 +89,7 @@ public class Lexer {
         readch(reader);
         if(peek != c)
             return false;
+        //这个特性！返回' '的特性使得peek先读一位的逻辑没有整体失效
         peek = ' ';
         return true;
     }
@@ -84,15 +98,68 @@ public class Lexer {
     public Token scan(Reader reader) throws IOException {
         //问题就在这里，不是scan阻止不了它，而是这个for循环会在文件尾一直循环，
         //如果照之前的 (; ; readch()) 的话
-        for( ; readch(reader); ) {
-            if(peek == ' ' || peek == '\t')
-                continue;
-            else if(peek == '\n')
+        //but new problem occur
+        //现在的状态是会先再read()取一个,就导致了没有空格的东西无法识别
+        while(peek == ' ' || peek == '\t' || peek == '\r' || peek == '\n') {
+            if(peek == '\n')
                 line = line + 1;
-            else
+            if(!readch(reader))
                 break;
         }
         
+        //去注释
+        if(peek == '/') {
+            int state = 1;
+            while(judgeEnd == 0) {
+                switch(state) {
+                case 1:
+                    readch(reader);
+                    if(peek == '*')
+                        state = 2;
+                    else
+                        return new Token('/');
+                    break;
+                case 2:
+                    readch(reader);
+                    if(peek == '*')
+                        state = 3;
+                    else if(peek == '"')
+                        state = 5;
+                    break;
+                case 3:
+                    readch(reader);
+                    if(peek == '*')
+                        state = 3;
+                    else if(peek == '/') {
+                        peek = ' '; 
+                        return null;
+                    } else {
+                        state = 2;
+                    }
+                    if(peek == '"')
+                        state = 4;
+                    break;
+                case 4:
+                    readch(reader);
+                    if(peek == '"')
+                        state = 2;
+                    break;
+                }
+            }
+        }
+        
+        if(peek == '"' ) {
+            StringBuffer b = new StringBuffer();
+            b.append(peek);
+            while(!readch(reader, '"')) {
+                b.append(peek);
+                if(judgeEnd == 1)
+                    return null;
+            }
+            b.append('"');
+            return new ConstString(b.toString());
+        }
+
         switch(peek) {
         case '&':
             if(readch(reader, '&'))  return Word.and;
@@ -135,19 +202,21 @@ public class Lexer {
         }
         
         if(Character.isLetter(peek) || peek == '_') {
-            StringBuffer b = new StringBuffer();
+            StringBuffer buffer = new StringBuffer();
             do {
-                b.append(peek);
+                buffer.append(peek);
                 readch(reader);
             } while(Character.isLetterOrDigit(peek));
-            String s = b.toString();
+            String s = buffer.toString();
             Word w = (Word)words.get(s);
             if(w != null)
                 return w;
             w = new Word(s, Tag.ID);
+            w.isID = 1;
             words.put(s, w);
             return w;
         }
+        
         //System.out.println("judgeEnd: " + judgeEnd);
         //it's mysterious.. must instantiate it first
         Token returnTok = new Token(peek);
@@ -157,5 +226,4 @@ public class Lexer {
         peek = ' ';
         return returnTok;
     }
-    
 }
