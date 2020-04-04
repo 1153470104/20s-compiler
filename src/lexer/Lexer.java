@@ -10,13 +10,24 @@ public class Lexer {
     Hashtable words = new Hashtable<>();
     List<Token> tokens = new LinkedList<>();
     String filename;
+    private static int judgeEnd = 0;
     
+    /**store word in words */
     void reserve(Word w) {
         words.put(w.lexeme, w);
     }
     
+    /**
+     * print tokens
+     */
+    public void tokenPrint() {
+        for(Token t: tokens) {
+            System.out.println("< " + (char)t.tag + ", " + t + " >");
+        }
+    }
+    
     //constructor
-    public Lexer(String filename) {
+    public Lexer(String name) {
         reserve(new Word("if", Tag.IF));
         reserve(new Word("else", Tag.ELSE));
         reserve(new Word("while", Tag.WHILE));
@@ -29,16 +40,16 @@ public class Lexer {
         reserve(Type.Int);
         reserve(Type.Float);
         
-        this.filename = filename;
+        this.filename = name;
         File file = new File(filename);
-        Token tok;
+        Token tok = new Token(peek);
         try {
             Reader reader = new InputStreamReader(new FileInputStream(file));
             do {
                 tok = scan(reader);
                 tokens.add(tok);
             }
-            while(tok.tag != -1);
+            while(judgeEnd == 0);
             tokens.remove(tok);
             
         } catch (IOException e) {
@@ -47,8 +58,19 @@ public class Lexer {
     }
     
     //read next char
-    void readch(Reader reader) throws IOException {
-        peek = (char)reader.read();
+    //the thing is, if read() can't get a char, it return -1
+    boolean readch(Reader reader) throws IOException {
+        int temp = reader.read();
+        //System.out.println(temp);
+        if(temp < 0) {
+            judgeEnd = 1;
+            peek = ' ';
+            return false;
+        }
+        
+        peek = (char)temp;
+        //System.out.println(peek);
+        return true;
     }
     boolean readch(Reader reader, char c) throws IOException {
         readch(reader);
@@ -60,7 +82,9 @@ public class Lexer {
     
     //main function: scan
     public Token scan(Reader reader) throws IOException {
-        for( ; ; readch(reader)) {
+        //问题就在这里，不是scan阻止不了它，而是这个for循环会在文件尾一直循环，
+        //如果照之前的 (; ; readch()) 的话
+        for( ; readch(reader); ) {
             if(peek == ' ' || peek == '\t')
                 continue;
             else if(peek == '\n')
@@ -107,6 +131,7 @@ public class Lexer {
                 x = x + Character.digit(peek, 10) / d;
                 d = d * 10;
             }
+            return new Real(x);
         }
         
         if(Character.isLetter(peek) || peek == '_') {
@@ -123,10 +148,14 @@ public class Lexer {
             words.put(s, w);
             return w;
         }
-        
-        Token tok = new Token(peek);
+        //System.out.println("judgeEnd: " + judgeEnd);
+        //it's mysterious.. must instantiate it first
+        Token returnTok = new Token(peek);
+        if(judgeEnd == 1) {
+            returnTok = null;
+        }
         peek = ' ';
-        return tok;
+        return returnTok;
     }
     
 }
