@@ -62,7 +62,7 @@ public class Lexer {
                     tokens.add(tok);
             }
             while(judgeEnd == 0);
-            tokens.remove(tok);
+            //tokens.remove(tok);
             reader.close();
             
         } catch (IOException e) {
@@ -182,24 +182,151 @@ public class Lexer {
         }
         
         if(Character.isDigit(peek)) {
-            int v = 0;
-            do {
-                v = 10 * v + Character.digit(peek, 10);
-                readch(reader);
-            } while(Character.isDigit(peek));
-            if(peek != '.')
-                return new Num(v);
-            float x = v;
-            float d = 10;
-            for(;;) {
-                readch(reader);
-                if(!Character.isDigit(peek))
+            int state = 0;
+            int v = 0;  float x = 0;  float d = 10;  int mul = 0; int PorN = 1;
+            
+            //System.out.println(peek);
+            int firstValue = Character.digit(peek, 10);
+            if(firstValue == 0)
+                state = 10;
+            while(judgeEnd == 0) {
+                switch(state) {
+                case 0:
+                    v = firstValue;
+                    readch(reader);
+                    if(Character.isDigit(peek))
+                        state = 1;
                     break;
-                x = x + Character.digit(peek, 10) / d;
-                d = d * 10;
+                case 1:
+                    v = v * 10 + Character.digit(peek, 10);
+                    readch(reader);
+                    if(Character.isDigit(peek))
+                        state = 1;
+                    else if(peek == '.')
+                        state = 2;
+                    else if(peek == 'E' || peek == 'e')
+                        state = 4;
+                    else {
+                        return new Num(v);
+                    }
+                    break;
+                case 2:
+                    readch(reader);
+                    if(Character.isDigit(peek))
+                        state = 3;
+                    else {
+                        System.out.println("Wrong float format!");
+                        return null;
+                    }
+                    break;
+                case 3:
+                    x = x + Character.digit(peek, 10) / d;
+                    d = d * 10;
+                    readch(reader);
+                    if(Character.isDigit(peek))
+                        state = 3;
+                    else if(peek == 'E' || peek == 'e')
+                        state = 4;
+                    else
+                        return new Real(v + x);
+                    break;
+                case 4:
+                    readch(reader);
+                    if(Character.isDigit(peek))
+                        state = 6;
+                    else if(peek == '+')
+                        state = 5;
+                    else if(peek == '-')
+                        PorN = -1;
+                    else {
+                        System.out.println("Wrong scientific notation");
+                        return null;
+                    }
+                    break;
+                case 5:
+                    readch(reader);
+                    if(Character.isDigit(peek))
+                        state = 6;
+                    else {
+                        System.out.println("Wrong scientific notation");
+                        return null;
+                    }
+                    break;
+                case 6:
+                    mul = mul * 10 + Character.digit(peek, 10);
+                    readch(reader);
+                    if(Character.isDigit(peek))
+                        state = 6;
+                    else {
+                        if(PorN == 1)
+                            return new Real((float)((v+x) * Math.pow(10, mul)));
+                        else if(PorN == -1)
+                            return new Real((float)((v+x) / Math.pow(10, mul)));
+                    }
+                    break;
+                        
+                //接下来识别二进制八进制十六进制
+                case 10:
+                    readch(reader);
+                    if(Character.isDigit(peek) && peek < '8')
+                        state = 11;
+                    else if(peek == 'X' || peek == 'x')
+                        state = 12;
+                    else if(peek == 'B' || peek == 'b')
+                        state = 13;
+                    break;
+                case 11:
+                    v = v * 8 + Character.digit(peek, 8);
+                    readch(reader);
+                    if(Character.isDigit(peek) && peek < '8')
+                        state = 11;
+                    else 
+                        return new Num(v);
+                    break;
+                    
+                case 12:
+                    readch(reader);
+                    if(Character.isDigit(peek) ||
+                            ('a' <= peek && peek <= 'f') || ('A' <= peek && peek <= 'F'))
+                        state = 15;
+                    else {
+                        System.out.println("Wrong hexadecimal format");
+                        return null;
+                    }
+                    break;
+                case 13:
+                    readch(reader);
+                    if(Character.isDigit(peek) && peek < '2')
+                        state = 16;
+                    else {
+                        System.out.println("Wrong binary format");
+                        return null;
+                    }
+                    break;
+                    
+                case 15:
+                    v = v * 16 + Character.digit(peek, 16);
+                    readch(reader);
+                    if(Character.isDigit(peek) ||
+                            ('a' <= peek && peek <= 'f') || ('A' <= peek && peek <= 'F'))
+                        state = 15;
+                    else 
+                        return new Num(v);
+                    break;
+                case 16:
+                    v = v * 2 + Character.digit(peek, 2);
+                    readch(reader);
+                    if(Character.isDigit(peek) && peek < '2')
+                        state = 16;
+                    else 
+                        return new Num(v);
+                    //the biggest problem is forget to add break in switch!!!
+                    //事实上时我早就改了，结果几个撤销之后我忘记我撤销了改这个bug的动作。。。太扯了吧
+                    break;
+                }
             }
-            return new Real(x);
         }
+        
         
         if(Character.isLetter(peek) || peek == '_') {
             StringBuffer buffer = new StringBuffer();

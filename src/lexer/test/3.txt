@@ -1,4 +1,8 @@
 float limitedSquare(x) {float x ;
     /* returns x-squared, but never more than 100 */
-    return (x<=-10.01 ||x>=l0.0)?100:x*x;
+    return (x<=-10.01 ||x>=10.0)?100:x*x;
 }
+int b = 0b1101
+
+int h = 0x1f1
+int o = 0224
