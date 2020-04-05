@@ -13,6 +13,17 @@ public class Lexer {
     Hashtable words = new Hashtable<>();
     List<Token> tokens = new LinkedList<>();
     String filename;
+    List<ErrorInfo> errors = new LinkedList<Lexer.ErrorInfo>();
+    
+    public class ErrorInfo {
+        public int line;
+        public String wrongInfo;
+        public ErrorInfo(int n, String v) {
+            line = n;
+            wrongInfo = v;
+        }
+    }
+    
     //judge if it's the end of the reader
     private static int judgeEnd = 0;
     
@@ -31,6 +42,12 @@ public class Lexer {
             } else {
             System.out.println("< " + t + " >");
             }
+        }
+    }
+    
+    public void errorPrint() {
+        for(ErrorInfo e: errors) {
+            System.out.println("Error in line " + e.line + ": " + e.wrongInfo);
         }
     }
     
@@ -66,7 +83,8 @@ public class Lexer {
             reader.close();
             
         } catch (IOException e) {
-            System.out.println("file read error.");
+            errors.add(new ErrorInfo(line, "Incorrect Input"));
+            //System.out.println("file read error.");
         }
     }
     
@@ -215,7 +233,7 @@ public class Lexer {
                     if(Character.isDigit(peek))
                         state = 3;
                     else {
-                        System.out.println("Wrong float format!");
+                        errors.add(new ErrorInfo(line, "Wrong float format"));
                         return null;
                     }
                     break;
@@ -239,7 +257,7 @@ public class Lexer {
                     else if(peek == '-')
                         PorN = -1;
                     else {
-                        System.out.println("Wrong scientific notation");
+                        errors.add(new ErrorInfo(line, "Wrong scientific notation"));
                         return null;
                     }
                     break;
@@ -248,7 +266,7 @@ public class Lexer {
                     if(Character.isDigit(peek))
                         state = 6;
                     else {
-                        System.out.println("Wrong scientific notation");
+                        errors.add(new ErrorInfo(line, "Wrong scientific notation"));
                         return null;
                     }
                     break;
@@ -290,7 +308,7 @@ public class Lexer {
                             ('a' <= peek && peek <= 'f') || ('A' <= peek && peek <= 'F'))
                         state = 15;
                     else {
-                        System.out.println("Wrong hexadecimal format");
+                        errors.add(new ErrorInfo(line, "Wrong hexadecimal format"));
                         return null;
                     }
                     break;
@@ -299,7 +317,7 @@ public class Lexer {
                     if(Character.isDigit(peek) && peek < '2')
                         state = 16;
                     else {
-                        System.out.println("Wrong binary format");
+                        errors.add(new ErrorInfo(line, "Wrong binary format"));
                         return null;
                     }
                     break;

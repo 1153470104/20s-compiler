@@ -3,6 +3,8 @@ float limitedSquare(x) {float x ;
     return (x<=-10.01 ||x>=10.0)?100:x*x;
 }
 int b = 0b1101
-
-int h = 0x1f1
+int h = 0x1f1g
+0xg
 int o = 0224
+while(value!=100){num++;}
+"the String""another test"
