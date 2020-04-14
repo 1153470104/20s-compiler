@@ -8,6 +8,6 @@ public class Real extends Token {
         value = v;
     }
     public String toString() {
-        return "float, " + value;
+        return "FLOAT, " + value;
     }
 }

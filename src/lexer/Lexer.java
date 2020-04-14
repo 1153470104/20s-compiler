@@ -7,13 +7,22 @@ import symbol.*;
 
 public class Lexer {
     public static int line = 1;
-    //最开始的地方老是会返回一个空token，发现原来是因为本来的peek 没有值，
-    //导致系统不做任何跳过就直接导出一个token了。。所以还是要设为 ' ',才对
     char peek = ' ';
+    String filename;
+    
     Hashtable words = new Hashtable<>();
     List<Token> tokens = new LinkedList<>();
-    String filename;
     List<ErrorInfo> errors = new LinkedList<Lexer.ErrorInfo>();
+    List<Comment> comments = new LinkedList<Lexer.Comment>();
+    
+    public class Comment {
+        public int line;
+        public String commentString;
+        public Comment(int l, String c) {
+            line = l;
+            commentString = c;
+        }
+    }
     
     public class ErrorInfo {
         public int line;
@@ -47,7 +56,13 @@ public class Lexer {
     
     public void errorPrint() {
         for(ErrorInfo e: errors) {
-            System.out.println("Error in line " + e.line + ": " + e.wrongInfo);
+            System.out.println("Error "+ "[" + e.line + "]" + ": " + e.wrongInfo);
+        }
+    }
+    
+    public void commentPrint() {
+        for(Comment e: comments) {
+            System.out.println("Comment "+ "[" + e.line + "]" + ": " + e.commentString);
         }
     }
     
@@ -107,17 +122,14 @@ public class Lexer {
         readch(reader);
         if(peek != c)
             return false;
-        //这个特性！返回' '的特性使得peek先读一位的逻辑没有整体失效
         peek = ' ';
         return true;
     }
     
-    //main function: scan
+
     public Token scan(Reader reader) throws IOException {
-        //问题就在这里，不是scan阻止不了它，而是这个for循环会在文件尾一直循环，
-        //如果照之前的 (; ; readch()) 的话
-        //but new problem occur
-        //现在的状态是会先再read()取一个,就导致了没有空格的东西无法识别
+
+        //去掉空格
         while(peek == ' ' || peek == '\t' || peek == '\r' || peek == '\n') {
             if(peek == '\n')
                 line = line + 1;
@@ -127,6 +139,8 @@ public class Lexer {
         
         //去注释
         if(peek == '/') {
+            StringBuffer buffer = new StringBuffer();
+            
             int state = 1;
             while(judgeEnd == 0) {
                 switch(state) {
@@ -142,30 +156,42 @@ public class Lexer {
                     if(peek == '*')
                         state = 3;
                     else if(peek == '"')
-                        state = 5;
+                        state = 4;
+                    else {
+                        buffer.append(peek);
+                        state = 2;
+                    }
                     break;
                 case 3:
                     readch(reader);
-                    if(peek == '*')
+                    if(peek == '*') {
                         state = 3;
+                        buffer.append(peek);
+                    }
                     else if(peek == '/') {
                         peek = ' '; 
+                        comments.add(new Comment(line, buffer.toString()));
                         return null;
                     } else {
                         state = 2;
+                        buffer.append(peek);
                     }
                     if(peek == '"')
                         state = 4;
+                        buffer.append(peek);
                     break;
                 case 4:
                     readch(reader);
-                    if(peek == '"')
+                    if(peek == '"') {
                         state = 2;
+                        buffer.append(peek);
+                    }
                     break;
                 }
             }
         }
         
+        //识别字符串型常量
         if(peek == '"' ) {
             StringBuffer b = new StringBuffer();
             b.append(peek);
@@ -178,6 +204,7 @@ public class Lexer {
             return new ConstString(b.toString());
         }
 
+        //识别比较运算符
         switch(peek) {
         case '&':
             if(readch(reader, '&'))  return Word.and;
@@ -203,7 +230,7 @@ public class Lexer {
             int state = 0;
             int v = 0;  float x = 0;  float d = 10;  int mul = 0; int PorN = 1;
             
-            //System.out.println(peek);
+            //识别数字和科学计数法
             int firstValue = Character.digit(peek, 10);
             if(firstValue == 0)
                 state = 10;
@@ -214,6 +241,8 @@ public class Lexer {
                     readch(reader);
                     if(Character.isDigit(peek))
                         state = 1;
+                    else
+                        return new Num(v);
                     break;
                 case 1:
                     v = v * 10 + Character.digit(peek, 10);
@@ -278,7 +307,7 @@ public class Lexer {
                     else {
                         if(PorN == 1)
                             return new Real((float)((v+x) * Math.pow(10, mul)));
-                        else if(PorN == -1)
+                        else
                             return new Real((float)((v+x) / Math.pow(10, mul)));
                     }
                     break;
@@ -339,13 +368,12 @@ public class Lexer {
                     else 
                         return new Num(v);
                     //the biggest problem is forget to add break in switch!!!
-                    //事实上时我早就改了，结果几个撤销之后我忘记我撤销了改这个bug的动作。。。太扯了吧
                     break;
                 }
             }
         }
         
-        
+        //识别标识符
         if(Character.isLetter(peek) || peek == '_') {
             StringBuffer buffer = new StringBuffer();
             do {
@@ -353,7 +381,7 @@ public class Lexer {
                 readch(reader);
             } while(Character.isLetterOrDigit(peek));
             String s = buffer.toString();
-            Word w = (Word)words.get(s);
+            Word w = (Word)words.get(s);//其中可以去除保留状态
             if(w != null)
                 return w;
             w = new Word(s, Tag.ID);
@@ -362,8 +390,7 @@ public class Lexer {
             return w;
         }
         
-        //System.out.println("judgeEnd: " + judgeEnd);
-        //it's mysterious.. must instantiate it first
+        
         Token returnTok = new Token(peek);
         if(judgeEnd == 1) {
             returnTok = null;

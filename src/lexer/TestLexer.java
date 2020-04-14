@@ -16,11 +16,16 @@ public class TestLexer {
     public static void test3() {
         Lexer l1 = new Lexer("./src/lexer/test/3.txt");
         l1.tokenPrint();
+        System.out.println();
+        l1.errorPrint();
+        System.out.println();
+        l1.commentPrint();
     }
     public static void main(String[] args) {
         //System.out.println("hexadecimal test: " + Character.digit('F', 16));
         //test1();
         //test2();
         test3();
+        
     }
 }

@@ -1,6 +1,5 @@
 package lexer;
 
-
 public class Word extends Token {
     public int isID = 0;
     public String lexeme = "";
@@ -9,13 +8,50 @@ public class Word extends Token {
         lexeme = s;
     }
     public String toString() {
-        if(isID == 1) {
+        switch(tag) {
+        case 256:
+            return "AND, " + lexeme;
+        case 257:
+            return "BASIC, " + lexeme;
+        case 258:
+            return "BREAK, " + lexeme;
+        case 259:
+            return "DO, " + lexeme;
+        case 260:
+            return "ELSE, " + lexeme;
+        case 261:
+            return "EQ, " + lexeme;
+        case 262:
+            return "FALSE, " + lexeme;
+        case 263:
+            return "GE, " + lexeme;
+        case 264:
             return "ID, " + lexeme;
-        } else if(isID == 0) {
-            return lexeme;
+        case 266:
+            return "INDEX, " + lexeme;
+        case 267:
+            return "LE, " + lexeme;
+        case 268:
+            return "MINUS, " + lexeme;
+        case 269:
+            return "NE, " + lexeme;
+
+        case 271:
+            return "OR, " + lexeme;
+
+        case 273:
+            return "TEMP, " + lexeme;
+
+        case 275:
+            return "WHILE, " + lexeme;
+        case 276:
+            return "RETURN, " + lexeme;
+
         }
         return lexeme;
+            
     }
+
     public static final Word
         and = new Word("&&", Tag.AND),
         or = new Word("||", Tag.OR),
@@ -25,6 +61,6 @@ public class Word extends Token {
         ge = new Word(">=", Tag.GE),
         minus = new Word("minus", Tag.MINUS),
         True = new Word("true", Tag.TRUE),
-        False = new Word("flase", Tag.FALSE),
+        False = new Word("false", Tag.FALSE),
         temp = new Word("t", Tag.TEMP);
  }

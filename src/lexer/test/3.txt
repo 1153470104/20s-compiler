@@ -1,10 +1,14 @@
-float limitedSquare(x) {float x ;
+float limitedSquare(x) {
+
+    float x ;
     /* returns x-squared, but never more than 100 */
-    return (x<=-10.01 ||x>=10.0)?100:x*x;
+    while(value!=100){num=1;}
+    Stirng = "the String""another test"
+    
+    return (x<=-0.01 ||x>=10.0||x==8 &&true & false)
 }
-int b = 0b1101
-int h = 0x1f1g
-0xg
-int o = 0224
-while(value!=100){num++;}
-"the String""another test"
+
+16.45E+4 170e. 100E-2
+0b1101 
+0x1f1g 0xg
+0224

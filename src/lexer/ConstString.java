@@ -9,6 +9,6 @@ public class ConstString extends Token {
     }
     
     public String toString() {
-        return "string, " + value;
+        return "STRING, " + value;
     }
 }

@@ -10,6 +10,6 @@ public class Num extends Token {
     
     //the wierdest bug i've ever meet before, i misspell toString ...
     public String toString() {
-        return "int, " + value;
+        return "INT, " + value;
     }
 }
