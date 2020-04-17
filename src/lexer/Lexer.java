@@ -14,7 +14,7 @@ public class Lexer {
     List<Token> tokens = new LinkedList<>();
     List<ErrorInfo> errors = new LinkedList<Lexer.ErrorInfo>();
     List<Comment> comments = new LinkedList<Lexer.Comment>();
-    
+
     public class Comment {
         public int line;
         public String commentString;
@@ -75,13 +75,29 @@ public class Lexer {
         reserve(new Word("break", Tag.BREAK));
         reserve(new Word("return", Tag.RETURN));
 
+        reserve(new Word("then", Tag.THEN));
+        reserve(new Word("record", Tag.RECORD));
+
         reserve(Word.True);
         reserve(Word.False);
         reserve(Type.Char);
         reserve(Type.Bool);
         reserve(Type.Int);
         reserve(Type.Float);
-        
+
+        reserve(Word.leftbracket);
+        reserve(Word.leftcurly);
+        reserve(Word.leftparen);
+        reserve(Word.rightbracket);
+        reserve(Word.rightcurly);
+        reserve(Word.rightparen);
+        reserve(Word.semicolumn);
+        reserve(Word.plus);
+        reserve(Word.sub);
+        reserve(Word.multi);
+        reserve(Word.divide);
+        reserve(Word.give);
+
         this.filename = name;
         File file = new File(filename);
         Token tok = new Token(peek);
@@ -214,7 +230,7 @@ public class Lexer {
             else   return new Token('|');
         case '=':
             if(readch(reader, '='))   return Word.eq;
-            else   return new Token('=');
+            else   return Word.give;
         case '!':
             if(readch(reader, '='))   return Word.ne;
             else   return new Token('!');
@@ -389,13 +405,21 @@ public class Lexer {
             words.put(s, w);
             return w;
         }
-        
-        
+
+        //接下来就是识别 各种括号括号了
         Token returnTok = new Token(peek);
+        Word w = (Word)words.get(returnTok.toString());
+        if(w != null) {
+//            System.out.println(w);
+            peek = ' ';
+            return w;
+        }
         if(judgeEnd == 1) {
             returnTok = null;
         }
+//        System.out.println(returnTok);
+        errors.add(new ErrorInfo(line, "Illigal Token"));
         peek = ' ';
-        return returnTok;
+        return null;
     }
 }
