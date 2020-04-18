@@ -9,6 +9,7 @@ public class TestParser {
     public static void testSyntax() throws IOException {
         Syntax s = new Syntax("./src/parser/syntax.txt");
 
+        System.out.println(s.syntax.size());
         Set<String> t = s.terminal();
         Set<String> nt = s.nonterminal();
 
@@ -22,11 +23,35 @@ public class TestParser {
         System.out.println(s.firstSet);
     }
 
-    public void testClosure() {
-        
+    public static void testClosure() throws IOException {
+        Parser p = new Parser();
+        Item i = new Item(List.of("P", "P'"), 1, "$");
+        ItemSet set = new ItemSet();
+        set.addItem(i);
+
+        set.printSet();
+        System.out.println();
+        p.closure(set);
+        set.printSet();
+    }
+
+    public static void testParse() throws IOException {
+        Parser p = new Parser();
+        Item i = new Item(List.of("P", "P'"), 1, "$");
+        ItemSet set = new ItemSet();
+        set.addItem(i);
+
+        p.parse(set);
+        for(int j = 0; j < p.allSet.size(); j++) {
+            System.out.println();
+            p.allSet.get(j).printSet();
+        }
     }
 
     public static void main(String[] args) throws IOException {
+//        testClosure();
+//        testSyntax();
+        testParse();
 
     }
 }

@@ -6,6 +6,23 @@ public class ItemSet {
     public Set<Item> itemSet = new HashSet<Item>();
     public Set<GotoItem> gotoItemSet = new HashSet<>();
 
+    public ItemSet() {
+    }
+
+    public boolean containsList(List<String> list) {
+        for(Item i: itemSet) {
+            List<String> units = i.units;
+            if(units.size() == list.size()) {
+                for(int j = 0; j < list.size(); j++) {
+                    if(!units.get(j).equals(list.get(j)))
+                        return false;
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** add an Item into the set */
     public void addItem(Item i) {
         itemSet.add(i);
@@ -17,7 +34,7 @@ public class ItemSet {
     }
 
     /** the inner class of itemSet */
-    class GotoItem {
+    public static class GotoItem {
         public String gotoSet;
         public ItemSet itemSet;
 

@@ -30,7 +30,7 @@ public class Syntax {
         //then iterate to calculate non-terminal's set
          do {
             count = countFirst();
-            System.out.println(count);
+            //System.out.println(count);
             for(String s: nt) {
                 Set<String> set = new HashSet<>();
                 for(List<String> l: syntax) {
@@ -57,6 +57,7 @@ public class Syntax {
 
     public void addFirst(String t, String s) {
         Set<String> set = firstSet.get(s);
+//        System.out.println(set);
         for(String first: set) {
             firstSet.get(t).add(first);
         }
@@ -78,6 +79,7 @@ public class Syntax {
     public void scanSymbol() {
         for(List<String> l: syntax) {
             for(String s: l) {
+//                System.out.println(s);
                 if(!symbol.contains(s)) {
                     symbol.add(s);
                 }
@@ -107,7 +109,7 @@ public class Syntax {
     public void addSyntax(String fileName) throws IOException {
         FileReader fr = new FileReader(fileName);
         BufferedReader br = new BufferedReader(fr);
-        String[] line = new String[1];
+        String[] line = new String[0];
         try{
             String stringLine;
             while (null != (stringLine = br.readLine())) {
