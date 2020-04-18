@@ -97,6 +97,7 @@ public class Lexer {
         reserve(Word.multi);
         reserve(Word.divide);
         reserve(Word.give);
+        reserve(Word.comma);
 
         this.filename = name;
         File file = new File(filename);

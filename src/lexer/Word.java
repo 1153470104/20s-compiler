@@ -107,6 +107,7 @@ public class Word extends Token {
         sub = new Word("-", Tag.SUB),
         multi = new Word("*", Tag.MULTI),
         divide = new Word("/", Tag.DIVIDE),
-        give = new Word("=", Tag.GIVE);
+        give = new Word("=", Tag.GIVE),
+        comma = new Word(",", Tag.COMMA);
 
 }
