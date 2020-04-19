@@ -60,19 +60,31 @@ public class TestParser {
         p.printDiagram();
     }
 
-    public static void testAnalyse() throws IOException {
-        Lexer l1 = new Lexer("./src/lexer/test/3.txt");
+    public static void testAnalyse(String filename) throws IOException {
+        Lexer l1 = new Lexer(filename);
+//        for(Token t: l1.tokens) {
+//            System.out.print(t.line + "      \t");
+//            System.out.print(t + "      \t");
+//            System.out.println(t.element());
+//        }
 
         Parser p = new Parser();
+        System.out.println(p.syntaxStuff.firstSet);
         Item i = new Item(List.of("P", "P'"), 1, "$");
         ItemSet set = new ItemSet();
         set.addItem(i);
 
         p.parse(set);
+        for(int j = 0; j < p.allSet.size(); j++) {
+            System.out.println();
+            p.allSet.get(j).printSet();
+        }
+
         p.createChart();
+        p.printDiagram();
 
         p.analyse(l1.tokens);
-        p.firstNode.printNode();
+        p.firstNode.printNode(0);
     }
 
     public static void main(String[] args) throws IOException {
@@ -80,6 +92,10 @@ public class TestParser {
 //        testSyntax();
 //        testParse();
 //        testChart();
-        testAnalyse();
+        testAnalyse("./src/lexer/test/2.txt");
+//        testAnalyse("./src/lexer/test/4.txt");
+//        testAnalyse("./src/lexer/test/5.txt");
+//        testAnalyse("./src/lexer/test/6.txt");
+//        testAnalyse("./src/lexer/test/2.txt");
     }
 }

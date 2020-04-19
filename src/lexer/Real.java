@@ -10,7 +10,7 @@ public class Real extends Token {
 
     @Override
     public String element() {
-        return "real";
+        return "digit";
     }
 
     public String toString() {

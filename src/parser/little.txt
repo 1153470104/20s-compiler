@@ -1,10 +1,10 @@
 P P'
-P' D
-D D D
-D T id ;
-T X C
-T record { D }
-X integer
-X real
-C [ num ] C
-C epsilon
+P' S
+S S S
+S id = E ;
+S L = E ;
+E E + E
+E id
+E digit
+E L
+

@@ -10,7 +10,7 @@ public class Num extends Token {
 
     @Override
     public String element() {
-        return "integer";
+        return "digit";
     }
 
     //the wierdest bug i've ever meet before, i misspell toString ...

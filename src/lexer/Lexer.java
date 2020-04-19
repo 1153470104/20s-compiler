@@ -98,6 +98,7 @@ public class Lexer {
         reserve(Word.divide);
         reserve(Word.give);
         reserve(Word.comma);
+        reserve(Word.call);
 
         this.filename = name;
         File file = new File(filename);
@@ -454,6 +455,7 @@ public class Lexer {
             Word w = (Word)words.get(s);//其中可以去除保留状态
             if(w != null) {
                 Word n = new Word(w.lexeme, w.tag);
+                n.isID = w.isID;
                 n.line = line;
                 return n;
             }

@@ -12,7 +12,7 @@ public class Tag {
         RIGHTBRACKET = 280, LEFTPAREN = 281, RIGHTPAREN = 282,
         LEFTCURLY = 283, RIGHTCURLY = 284, SEMICOLUMN = 285,
         THEN = 286, PLUS = 287, SUB = 288, MULTI = 289, DIVIDE = 290,
-        GIVE = 291, COMMA = 292;
+        GIVE = 291, COMMA = 292, NONTERMINAL = 293, CALL = 294;
     ;
     
 }

@@ -16,36 +16,78 @@ public class Parser {
     public Node firstNode;
     List<ErrorInfo> errors = new LinkedList<>();
 
+    public Node getTokenToNode(List<Token> inputList, int tokenIndex) {
+        Node peek;
+        if(tokenIndex == inputList.size()) {
+            peek = new Node(new Word("$", '$'), new LinkedList<Node>());
+            peek.nodeSymbol.line = inputList.get(inputList.size()-1).line;
+        }else {
+            peek = new Node(inputList.get(tokenIndex), new LinkedList<Node>());
+        }
+        return peek;
+    }
+
     public void analyse(List<Token> inputList) {
+        int line = 0;
         int tokenIndex = 0;
-        StackUnit first = new StackUnit(0, new Node("$", null));
-        stack.add(first);
+        int operation = 0;
+        StackUnit first = new StackUnit(0, new Node(new Word("$", '$'), new LinkedList<Node>()));
+        stack.push(first);
+
+        Node temp;
+        temp = getTokenToNode(inputList, tokenIndex);
+        line = temp.nodeSymbol.line;
+        int indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
+        operation = analysisChart[stack.peek().status][indexOfPeek];
+
         while(true) {
-            Node peek = new Node(inputList.get(tokenIndex).element(), null);
-            int indexOfPeek = symbolList.indexOf(peek.nodeSymbol);
-            int operation = analysisChart[stack.peek().status][indexOfPeek];
+            System.out.println("symbol: " + temp.nodeSymbol);
+            System.out.println("status: " + stack.peek().status);
+            System.out.println("operation: " + operation);
+            System.out.println("tokenIndex: " + tokenIndex);
+
+            //当出错的时候
             if(operation > 500) {
-                errors.add(new ErrorInfo(inputList.get(tokenIndex).line, "Syntax error!"));
+                errors.add(new ErrorInfo(inputList.get(tokenIndex).line, "syntax error!"));
             }
+            //需要移入的时候
             if(operation >= 0) {
-                stack.push(new StackUnit(operation, peek));
+                stack.push(new StackUnit(operation, temp));
+
+                tokenIndex += 1;
+                temp = getTokenToNode(inputList, tokenIndex);
+                indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
+                operation = analysisChart[stack.peek().status][indexOfPeek];
+
+            //需要归约的时候
             } else if(operation != -1000) {
                 int reduce = syntaxList.get(-1 * operation).size() - 1;
-                Node n = new Node(syntaxList.get(-1 * operation).get(0), null);
+//                System.out.println("-------------------- reduce: " + reduce);
+                Word ww = new Word(syntaxList.get(-1 * operation).get(0), Tag.NONTERMINAL);
+                ww.line = line;
+                Node n = new Node(ww, new LinkedList<Node>());
                 for(int i = 0; i < reduce; i++) {
                     n.nodeSet.add(stack.peek().element);
                     stack.pop();
                 }
-                int indexOfNt = syntaxList.indexOf(n.nodeSymbol);
-                stack.push(new StackUnit(analysisChart[stack.peek().status][indexOfNt], n));
+                int indexOfNt = symbolList.indexOf(n.nodeSymbol.element());
+                int prevstatus = stack.peek().status;
+                operation = analysisChart[prevstatus][indexOfNt];
+                temp = n;
+                tokenIndex -= 1;
+
+            //分析结束
             } else {
-                firstNode = new Node("P", null);
+                Word ww = new Word("P", Tag.NONTERMINAL);
+                ww.line = line;
+                firstNode = new Node(ww, new LinkedList<Node>());
                 firstNode.nodeSet.add(stack.peek().element);
                 break;
             }
+//            System.out.println("status after: " + stack.peek().status);
+//            System.out.println();
         }
     }
-
 
     public int indexOfSyntax(List<String> l) {
         for(int i = 0; i < syntaxList.size(); i++) {

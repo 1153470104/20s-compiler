@@ -1,6 +1,13 @@
-if(Character.isDigit(peek) && peek < '8')
-    state = 11;
-else if(peek == 'X' || peek == 'x')
-    state = 12;
-else(peek == 'B' || peek == 'b')
-    state = 13;
+y = 8 + i;
+z = 6 * 8;
+
+a[1] = s;
+a[1][4] = 2;
+
+z = a[1];
+
+call func ( a , b )
+
+if ( true ) then a = 9; else b = 7;
+
+while ( true ) do a = 5;
