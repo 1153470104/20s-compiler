@@ -2,15 +2,7 @@ package parser;
 
 import java.util.*;
 
-public class ParseTree {
-    public Node firstNode;
-
-    public ParseTree(Node firstNode) {
-        this.firstNode = firstNode;
-    }
-}
-
-class Node {
+public class Node {
     public String nodeSymbol;
     public Set<Node> nodeSet = new HashSet<>();
 
@@ -22,4 +14,5 @@ class Node {
     public void addNode(Node n) {
         this.nodeSet.add(n);
     }
+
 }

@@ -15,9 +15,9 @@ public class Item {
 
     /** return the next status of this item */
     public Item afterItem() {
-        if(units.size() < item)
+        if(units.size() <= item)
             return null;
-        return new Item(this.units, item + 1, lookahead);
+        return new Item(this.units, (this.item + 1), lookahead);
     }
 
     /** judge if the next item unit is the specific unit */

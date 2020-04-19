@@ -7,7 +7,12 @@ public class Num extends Token {
         super(Tag.NUM);
         value = v;
     }
-    
+
+    @Override
+    public String element() {
+        return "integer";
+    }
+
     //the wierdest bug i've ever meet before, i misspell toString ...
     public String toString() {
         return "INT, " + value;

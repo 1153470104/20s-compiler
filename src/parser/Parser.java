@@ -1,5 +1,6 @@
 package parser;
 
+import lexer.*;
 import javax.swing.text.Utilities;
 import java.io.IOException;
 import java.util.*;
@@ -8,9 +9,87 @@ public class Parser {
     public List<ItemSet> allSet = new LinkedList<>();
     public Stack<stackUnit> stack = new Stack<>();
 //    public Syntax syntaxStuff = new Syntax("./src/parser/syntax.txt");
-    public Syntax syntaxStuff = new Syntax("./src/parser/little.txt");
+    public Syntax syntaxStuff = new Syntax("./src/parser/syntax.txt");
+    public int[][] analysisChart;
+    public List<String> symbolList = new LinkedList<>();
+    public List<List<String>> syntaxList = new LinkedList<>();
+    public Node firstNode;
+
+    public void analyse(List<Token> inputList) {
+
+    }
+
+
+    public int indexOfSyntax(List<String> l) {
+        for(int i = 0; i < syntaxList.size(); i++) {
+            List<String> tempList = syntaxList.get(i);
+            boolean isSame = true;
+            if(l.size() == tempList.size()) {
+                for(int j = 0; j < l.size(); j++) {
+                    if(!l.get(j).equals(tempList.get(j))) {
+                        isSame = false;
+                        break;
+                    }
+                }
+            } else {
+                isSame = false;
+            }
+            if(isSame)
+                return i;
+        }
+        return 6666;
+    }
+
+    public int indexOfSet(ItemSet s) {
+        for(int i = 0; i < allSet.size(); i++) {
+            if(allSet.get(i).setEquals(s)) {
+                return i;
+            }
+        }
+        return 8888;
+    }
+    /**
+     * 接下来指定LR分析表的读取规则
+     */
+    public void createChart() {
+        analysisChart = new int[allSet.size()][symbolList.size()];
+        for(int ii = 0; ii < allSet.size(); ii++) {
+            for(int jj = 0; jj < symbolList.size(); jj++) {
+                analysisChart[ii][jj] = 1000;
+            }
+        }
+
+        for(int i = 0; i < allSet.size(); i++) {
+            for(Item everyItem: allSet.get(i).itemSet) {
+                //acc和回收的条目
+                if(everyItem.item == everyItem.units.size()) {
+                    if(everyItem.units.get(0).equals("P")) {
+                        analysisChart[i][symbolList.indexOf("$")] = -1000;
+                    } else {
+                        String indexSymbol = everyItem.lookahead;
+                        int syntaxIndex = indexOfSyntax(everyItem.units);
+                        analysisChart[i][symbolList.indexOf(indexSymbol)]
+                                = -1 * syntaxIndex;
+                    }
+                //跳转的条目
+                } else {
+                    String nextUnit = everyItem.units.get(everyItem.item);
+                    for (ItemSet.GotoItem g : allSet.get(i).gotoItemSet) {
+                        if (g.gotoSet.equals(nextUnit)) {
+                            analysisChart[i][symbolList.indexOf(nextUnit)]
+                                    = indexOfSet(g.itemSet);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     public Parser() throws IOException {
+        symbolList.addAll(syntaxStuff.terminal());
+        symbolList.add("$");
+        symbolList.addAll(syntaxStuff.nonterminal());
+        syntaxList.addAll(syntaxStuff.syntax);
     }
 
     /** the closure function */
@@ -30,7 +109,7 @@ public class Parser {
                 //if the unit next is not terminal
                 if (i.ifNonTerminalNext(nt)) {
                     for (List<String> l : syntaxList) {
-                        if(!s.containsList(l)) {
+//                        if(!s.containsList(l)) {
                             //add new item into this item set
                             if (l.get(0).equals(i.units.get(i.item))) {
                                 String nextNext = i.nextNextUnit();
@@ -45,8 +124,7 @@ public class Parser {
                                     }
                                 }
                             }
-                        }
-
+//                        }
                     }
                 }
 //                System.out.print("try: ");s.printSet();
@@ -56,23 +134,26 @@ public class Parser {
                 s.addItem(i);
             }
         } while(setSize != s.itemSet.size());
-        System.out.println("set size: " + setSize);
+
+//        System.out.println("set size: " + setSize);
     }
 
     /** goto method */
     public ItemSet Goto(ItemSet s, String x) {
         ItemSet newSet = new ItemSet();
+        //对每一个set里面的item
         for(Item i: s.itemSet) {
-            if(i.ifItemNext(x))
+            //检查下一个item是不是x
+            if(i.ifItemNext(x)) {
                 newSet.addItem(i.afterItem());
+            }
         }
         s.gotoItemSet.add(new ItemSet.GotoItem(x, newSet));
+        newSet.sourceItemSet.add(new ItemSet.GotoItem(x, s));
         if(newSet.itemSet.size() == 0) {
             return null;
-        }
-        return newSet;
+        }return newSet;
     }
-
     /** the main parse method */
     public void parse(ItemSet veryFirst) {
         int size;
@@ -80,14 +161,33 @@ public class Parser {
         int count = 0;
         do {
             size = allSet.size();
-            for(; count < size; count++) {
-                //把count到size的集合都扩充分了
-                closure(allSet.get(count));
-                //其中每个集合都发展下线
-                for(String x: syntaxStuff.symbol) {
-                    ItemSet i = Goto(allSet.get(count), x);
-                    if(i != null)
-                        allSet.add(i);
+            for(; count < size; ) {
+//                System.out.println("          the count: " + count); //把count到size的集合都扩充分了
+//                System.out.println("          the size: " + size);
+                closure(allSet.get(count)); //其中每个集合都发展下线
+
+                //检查一下有没有已经有过的项目集出现，直接合并
+                boolean deleteOrNot = false;
+                for(int i = 0; i < count; i++) {
+                    if(allSet.get(i).setEquals(allSet.get(count))) {
+//                        System.out.println("combine!!");
+                        size -= 1;
+                        allSet.get(i).combineSourceSet(allSet.get(count));
+                        allSet.remove(count);
+                        deleteOrNot = true;
+                        break;
+                    }
+                }
+
+                //allSet.get(count).printSet()
+                if(!deleteOrNot) {
+                    for (String x : syntaxStuff.symbol) {
+                        ItemSet iset = Goto(allSet.get(count), x);
+                        if (iset != null) {
+                            allSet.add(iset);
+                        }
+                    }
+                    count += 1;
                 }
             }
         } while(size != allSet.size());
@@ -95,16 +195,20 @@ public class Parser {
 
     /** print the analysis diagram */
     public void printDiagram() {
-
+        for(int k = 0; k < symbolList.size(); k++) {
+            System.out.print(symbolList.get(k) + "\t");
+        }
+        System.out.println();
+        for(int i = 0; i < allSet.size(); i++) {
+            for(int j = 0; j < symbolList.size(); j++) {
+                System.out.print(analysisChart[i][j] + "\t");
+            }
+            System.out.println();
+        }
     }
 
     class stackUnit {
-        public ItemSet currentItemSet;
-        public String currentString;
-
-        public stackUnit(ItemSet currentItemSet, String currentString) {
-            this.currentItemSet = currentItemSet;
-            this.currentString = currentString;
-        }
+        public int currentItemSet;
+        public Node currentString;
     }
 }

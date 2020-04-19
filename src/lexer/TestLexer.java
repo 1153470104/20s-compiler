@@ -21,11 +21,20 @@ public class TestLexer {
         System.out.println();
         l1.commentPrint();
     }
+
+    public static void testElement() {
+        Lexer l1 = new Lexer("./src/lexer/test/3.txt");
+        for(Token t: l1.tokens) {
+            System.out.print(t + "      \t");
+            System.out.println(t.element());
+        }
+    }
     public static void main(String[] args) {
         //System.out.println("hexadecimal test: " + Character.digit('F', 16));
         //test1();
         //test2();
-        test3();
+//        test3();
+        testElement();
         
     }
 }

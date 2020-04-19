@@ -48,10 +48,21 @@ public class TestParser {
         }
     }
 
+    public static void testChart() throws IOException {
+        Parser p = new Parser();
+        Item i = new Item(List.of("P", "P'"), 1, "$");
+        ItemSet set = new ItemSet();
+        set.addItem(i);
+
+        p.parse(set);
+        p.createChart();
+        p.printDiagram();
+    }
+
     public static void main(String[] args) throws IOException {
 //        testClosure();
 //        testSyntax();
-        testParse();
-
+//        testParse();
+        testChart();
     }
 }

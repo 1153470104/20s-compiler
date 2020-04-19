@@ -7,6 +7,12 @@ public class Real extends Token {
         super(Tag.REAL);
         value = v;
     }
+
+    @Override
+    public String element() {
+        return "real";
+    }
+
     public String toString() {
         return "FLOAT, " + value;
     }

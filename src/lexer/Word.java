@@ -7,6 +7,15 @@ public class Word extends Token {
         super(tag);
         lexeme = s;
     }
+
+    @Override
+    public String element() {
+        if(isID == 1) {
+            return "id";
+        }
+        return lexeme;
+    }
+
     public String toString() {
         switch(tag) {
             case 256:
@@ -77,12 +86,12 @@ public class Word extends Token {
                 return "DIVIDE, " + lexeme;
             case 291:
                 return "GIVE, " + lexeme;
-
         }
 
         return lexeme;
             
     }
+
 
     public static final Word
         and = new Word("&&", Tag.AND),

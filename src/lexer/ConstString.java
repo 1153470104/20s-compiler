@@ -7,7 +7,12 @@ public class ConstString extends Token {
         super(Tag.STRING);
         value = v;
     }
-    
+
+    @Override
+    public String element() {
+       return "String";
+    }
+
     public String toString() {
         return "STRING, " + value;
     }

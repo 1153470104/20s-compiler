@@ -5,6 +5,7 @@ import java.util.*;
 public class ItemSet {
     public Set<Item> itemSet = new HashSet<Item>();
     public Set<GotoItem> gotoItemSet = new HashSet<>();
+    public Set<GotoItem> sourceItemSet = new HashSet<>();
 
     public ItemSet() {
     }
@@ -33,6 +34,27 @@ public class ItemSet {
         gotoItemSet.add(new GotoItem(x, s));
     }
 
+
+    public void printSet() {
+        for(Item i: itemSet) {
+            System.out.println(i);
+        }
+    }
+
+    public boolean setEquals(ItemSet otherSet) {
+        if(otherSet.itemSet.size() != this.itemSet.size())
+            return false;
+        for(Item oi: otherSet.itemSet){
+            if(!this.itemSet.contains(oi))
+                return false;
+        }
+        return true;
+    }
+
+    public void combineSourceSet(ItemSet s) {
+        this.sourceItemSet.addAll(s.sourceItemSet);
+    }
+
     /** the inner class of itemSet */
     public static class GotoItem {
         public String gotoSet;
@@ -42,11 +64,19 @@ public class ItemSet {
             this.gotoSet = gotoSet;
             this.itemSet = itemSet;
         }
-    }
 
-    public void printSet() {
-        for(Item i: itemSet) {
-            System.out.println(i);
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof GotoItem)) return false;
+            GotoItem gotoItem = (GotoItem) o;
+            return gotoSet.equals(gotoItem.gotoSet) &&
+                    itemSet.setEquals(gotoItem.itemSet);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(gotoSet, itemSet);
         }
     }
 }
