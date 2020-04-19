@@ -15,4 +15,12 @@ public class Node {
         this.nodeSet.add(n);
     }
 
+    public void printNode() {
+        while(this.nodeSet != null) {
+            for(Node i: this.nodeSet) {
+                i.printNode();
+            }
+        }
+        System.out.println(this.nodeSymbol);
+    }
 }

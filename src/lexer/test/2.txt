@@ -1,2 +1,6 @@
-while(value!=100){num++;}
-"the String""another test"
+if(Character.isDigit(peek) && peek < '8')
+    state = 11;
+else if(peek == 'X' || peek == 'x')
+    state = 12;
+else(peek == 'B' || peek == 'b')
+    state = 13;

@@ -11,7 +11,7 @@ public class Lexer {
     String filename;
     
     Hashtable words = new Hashtable<>();
-    List<Token> tokens = new LinkedList<>();
+    public List<Token> tokens = new LinkedList<>();
     List<ErrorInfo> errors = new LinkedList<Lexer.ErrorInfo>();
     List<Comment> comments = new LinkedList<Lexer.Comment>();
 
@@ -218,28 +218,58 @@ public class Lexer {
                     return null;
             }
             b.append('"');
-            return new ConstString(b.toString());
+            ConstString s = new ConstString(b.toString());
+            s.line = line;
+            return s;
         }
 
         //识别比较运算符
         switch(peek) {
         case '&':
-            if(readch(reader, '&'))  return Word.and;
+            if(readch(reader, '&')) {
+                Word a = new Word(Word.and.lexeme, Word.and.tag);
+                a.line = line;
+                return a;
+            }
             else  return new Token('&');
         case '|':
-            if(readch(reader, '|'))  return Word.or;
+            if(readch(reader, '|')) {
+                Word a = new Word(Word.or.lexeme, Word.or.tag);
+                a.line = line;
+                return a;
+            }
             else   return new Token('|');
         case '=':
-            if(readch(reader, '='))   return Word.eq;
-            else   return Word.give;
+            if(readch(reader, '=')) {
+                Word a = new Word(Word.eq.lexeme, Word.eq.tag);
+                a.line = line;
+                return a;
+            }
+            else  {
+                Word a = new Word(Word.give.lexeme, Word.give.tag);
+                a.line = line;
+                return a;
+            }
         case '!':
-            if(readch(reader, '='))   return Word.ne;
+            if(readch(reader, '=')) {
+                Word a = new Word(Word.ne.lexeme, Word.ne.tag);
+                a.line = line;
+                return a;
+            }
             else   return new Token('!');
         case '<':
-            if(readch(reader, '='))   return Word.le;
+            if(readch(reader, '=')) {
+                Word a = new Word(Word.le.lexeme, Word.le.tag);
+                a.line = line;
+                return a;
+            }
             else   return new Token('<');
         case '>':
-            if(readch(reader, '='))  return Word.ge;
+            if(readch(reader, '=')) {
+                Word a = new Word(Word.ge.lexeme, Word.ge.tag);
+                a.line = line;
+                return a;
+            }
             else  return new Token('>');
         }
         
@@ -258,8 +288,11 @@ public class Lexer {
                     readch(reader);
                     if(Character.isDigit(peek))
                         state = 1;
-                    else
-                        return new Num(v);
+                    else {
+                        Num n = new Num(v);
+                        n.line = line;
+                        return n;
+                    }
                     break;
                 case 1:
                     v = v * 10 + Character.digit(peek, 10);
@@ -271,7 +304,9 @@ public class Lexer {
                     else if(peek == 'E' || peek == 'e')
                         state = 4;
                     else {
-                        return new Num(v);
+                        Num n = new Num(v);
+                        n.line = line;
+                        return n;
                     }
                     break;
                 case 2:
@@ -291,8 +326,11 @@ public class Lexer {
                         state = 3;
                     else if(peek == 'E' || peek == 'e')
                         state = 4;
-                    else
-                        return new Real(v + x);
+                    else {
+                        Real n = new Real(v + x);
+                        n.line = line;
+                        return n;
+                    }
                     break;
                 case 4:
                     readch(reader);
@@ -322,13 +360,19 @@ public class Lexer {
                     if(Character.isDigit(peek))
                         state = 6;
                     else {
-                        if(PorN == 1)
-                            return new Real((float)((v+x) * Math.pow(10, mul)));
-                        else
-                            return new Real((float)((v+x) / Math.pow(10, mul)));
+                        if(PorN == 1) {
+                            Real n = new Real((float)((v+x) * Math.pow(10, mul)));
+                            n.line = line;
+                            return n;
+                        }
+                        else {
+                            Real n = new Real((float) ((v + x) / Math.pow(10, mul)));
+                            n.line = line;
+                            return n;
+                        }
                     }
                     break;
-                        
+
                 //接下来识别二进制八进制十六进制
                 case 10:
                     readch(reader);
@@ -344,8 +388,11 @@ public class Lexer {
                     readch(reader);
                     if(Character.isDigit(peek) && peek < '8')
                         state = 11;
-                    else 
-                        return new Num(v);
+                    else {
+                        Num n = new Num(v);
+                        n.line = line;
+                        return n;
+                    }
                     break;
                     
                 case 12:
@@ -374,16 +421,22 @@ public class Lexer {
                     if(Character.isDigit(peek) ||
                             ('a' <= peek && peek <= 'f') || ('A' <= peek && peek <= 'F'))
                         state = 15;
-                    else 
-                        return new Num(v);
+                    else {
+                        Num n = new Num(v);
+                        n.line = line;
+                        return n;
+                    }
                     break;
                 case 16:
                     v = v * 2 + Character.digit(peek, 2);
                     readch(reader);
                     if(Character.isDigit(peek) && peek < '2')
                         state = 16;
-                    else 
-                        return new Num(v);
+                    else {
+                        Num n = new Num(v);
+                        n.line = line;
+                        return n;
+                    }
                     //the biggest problem is forget to add break in switch!!!
                     break;
                 }
@@ -399,11 +452,15 @@ public class Lexer {
             } while(Character.isLetterOrDigit(peek));
             String s = buffer.toString();
             Word w = (Word)words.get(s);//其中可以去除保留状态
-            if(w != null)
-                return w;
+            if(w != null) {
+                Word n = new Word(w.lexeme, w.tag);
+                n.line = line;
+                return n;
+            }
             w = new Word(s, Tag.ID);
             w.isID = 1;
             words.put(s, w);
+            w.line = line;
             return w;
         }
 
@@ -413,7 +470,9 @@ public class Lexer {
         if(w != null) {
 //            System.out.println(w);
             peek = ' ';
-            return w;
+            Word n = new Word(w.lexeme, w.tag);
+            n.line = line;
+            return n;
         }
         if(judgeEnd == 1) {
             returnTok = null;

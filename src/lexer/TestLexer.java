@@ -25,6 +25,7 @@ public class TestLexer {
     public static void testElement() {
         Lexer l1 = new Lexer("./src/lexer/test/3.txt");
         for(Token t: l1.tokens) {
+            System.out.print(t.line + "      \t");
             System.out.print(t + "      \t");
             System.out.println(t.element());
         }

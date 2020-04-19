@@ -1,5 +1,6 @@
 package parser;
 
+import lexer.*;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -59,10 +60,26 @@ public class TestParser {
         p.printDiagram();
     }
 
+    public static void testAnalyse() throws IOException {
+        Lexer l1 = new Lexer("./src/lexer/test/3.txt");
+
+        Parser p = new Parser();
+        Item i = new Item(List.of("P", "P'"), 1, "$");
+        ItemSet set = new ItemSet();
+        set.addItem(i);
+
+        p.parse(set);
+        p.createChart();
+
+        p.analyse(l1.tokens);
+        p.firstNode.printNode();
+    }
+
     public static void main(String[] args) throws IOException {
 //        testClosure();
 //        testSyntax();
 //        testParse();
-        testChart();
+//        testChart();
+        testAnalyse();
     }
 }

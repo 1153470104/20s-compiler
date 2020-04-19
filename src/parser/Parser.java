@@ -7,16 +7,43 @@ import java.util.*;
 
 public class Parser {
     public List<ItemSet> allSet = new LinkedList<>();
-    public Stack<stackUnit> stack = new Stack<>();
+    public Stack<StackUnit> stack = new Stack<>();
 //    public Syntax syntaxStuff = new Syntax("./src/parser/syntax.txt");
     public Syntax syntaxStuff = new Syntax("./src/parser/syntax.txt");
     public int[][] analysisChart;
     public List<String> symbolList = new LinkedList<>();
     public List<List<String>> syntaxList = new LinkedList<>();
     public Node firstNode;
+    List<ErrorInfo> errors = new LinkedList<>();
 
     public void analyse(List<Token> inputList) {
-
+        int tokenIndex = 0;
+        StackUnit first = new StackUnit(0, new Node("$", null));
+        stack.add(first);
+        while(true) {
+            Node peek = new Node(inputList.get(tokenIndex).element(), null);
+            int indexOfPeek = symbolList.indexOf(peek.nodeSymbol);
+            int operation = analysisChart[stack.peek().status][indexOfPeek];
+            if(operation > 500) {
+                errors.add(new ErrorInfo(inputList.get(tokenIndex).line, "Syntax error!"));
+            }
+            if(operation >= 0) {
+                stack.push(new StackUnit(operation, peek));
+            } else if(operation != -1000) {
+                int reduce = syntaxList.get(-1 * operation).size() - 1;
+                Node n = new Node(syntaxList.get(-1 * operation).get(0), null);
+                for(int i = 0; i < reduce; i++) {
+                    n.nodeSet.add(stack.peek().element);
+                    stack.pop();
+                }
+                int indexOfNt = syntaxList.indexOf(n.nodeSymbol);
+                stack.push(new StackUnit(analysisChart[stack.peek().status][indexOfNt], n));
+            } else {
+                firstNode = new Node("P", null);
+                firstNode.nodeSet.add(stack.peek().element);
+                break;
+            }
+        }
     }
 
 
@@ -207,8 +234,23 @@ public class Parser {
         }
     }
 
-    class stackUnit {
-        public int currentItemSet;
-        public Node currentString;
+    class StackUnit {
+        public int status;
+        public Node element;
+
+        public StackUnit(int status, Node element) {
+            this.status = status;
+            this.element = element;
+        }
+    }
+
+    class ErrorInfo {
+        public int line;
+        public String errorInfo;
+
+        public ErrorInfo(int line, String errorInfo) {
+            this.line = line;
+            this.errorInfo = errorInfo;
+        }
     }
 }

@@ -5,7 +5,7 @@ float limitedSquare(x) {
     while(value!=100){num=1;}
     Stirng = "the String""another test"
     
-    return (x<=-0.01 ||x>=10.0||x==8 &&true & false)
+    return (x<=-0.01 ||x>=10.0||x==8 &&true || false)
 }
 
 16.45E+4 170e. 100E-2
