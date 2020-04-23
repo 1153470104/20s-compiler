@@ -1,0 +1,70 @@
+Program P
+P D P
+P S P
+P empty
+
+D T id A ;
+D record id { P }   /*变量声明，记录声明*/
+A = F A
+A empty
+A , id A        /*声明时赋值，连续声明*/
+T X C
+X int
+X real
+X char	     /*允许变量声明的类型*/
+C [ num ] C
+C empty	     /*声明数组类型，允许多维*/
+
+S L = E ;
+S if B then S else S
+S while B do S /*赋值语句，分支语句，循环语句*/
+
+E G E'			     	/*表达式*/
+E' + G E'
+E' empty
+G F G'
+G' * F G'
+G' empty
+F ( E )
+F id
+F digit
+F char
+L id L'		/*对变量或是数组进行赋值*/
+L' [ num ] L'
+L' empty
+
+S for ( id = E ; B ; id V ) { S } /*for语句*/
+V ++
+V --			   /*++语句和--语句*/
+S switch ( id ) { N default : S } /*switch语句*/
+N case digit : S N
+N empty    	   /*switch语句内部结构*/
+
+B H B'			/*逻辑表达式*/
+B' or H B'
+B' empty
+H I H'
+H' and I H'
+H' empty
+I not B
+I ( B )
+I E relop E
+I true
+I false
+relop <
+relop <=
+relop ==
+relop !=
+relop >
+relop >=
+
+D proc X id ( M ) { P }   /*函数声明*/
+M X id M'
+M empty      	   /*参数类型声明*/
+M' , X id M'
+M' empty
+S call id ( Elist ) ;
+S return E ;    /*函数调用和返回值*/
+Elist E Elist'
+Elist' , E Elist'
+Elist' empty

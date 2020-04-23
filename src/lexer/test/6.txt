@@ -1,1 +1,4 @@
-float j;
+int j ;
+float k;
+k = 0;
+

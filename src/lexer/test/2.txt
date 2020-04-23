@@ -4,10 +4,11 @@ z = 6 * 8;
 a[1] = s;
 a[1][4] = 2;
 
-z = a[1];
+z = b[a];
+
 
 call func ( a , b )
 
 if ( true ) then a = 9; else b = 7;
 
-while ( true ) do a = 5;
+

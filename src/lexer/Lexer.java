@@ -91,7 +91,7 @@ public class Lexer {
         reserve(Word.rightbracket);
         reserve(Word.rightcurly);
         reserve(Word.rightparen);
-        reserve(Word.semicolumn);
+        reserve(Word.semicolon);
         reserve(Word.plus);
         reserve(Word.sub);
         reserve(Word.multi);

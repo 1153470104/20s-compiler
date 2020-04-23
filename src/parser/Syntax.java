@@ -14,6 +14,33 @@ public class Syntax {
         this.addFirstSet();
     }
 
+    public boolean canEmpty(String s) {
+        for(List<String> l: syntax) {
+            if(l.get(0).equals(s) && l.get(1).equals("empty")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean evolveEmpty(List<String> l) {
+        if(l.get(1).equals("empty")) {
+            return true;
+        }
+        for(String s: l) {
+            for(List<String> l1: syntax) {
+                if(l1.get(0).equals(s)){
+                    if(l1.get(1).equals("empty"))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * calculate the FIRST set of terminals
+     */
     public void addFirstSet() {
         Set<String> nt = nonterminal();
         //first add terminal's first set
@@ -30,23 +57,25 @@ public class Syntax {
         //then iterate to calculate non-terminal's set
          do {
             count = countFirst();
-            //System.out.println(count);
             for(String s: nt) {
                 Set<String> set = new HashSet<>();
                 for(List<String> l: syntax) {
                     if(l.get(0).equals(s)) {
                         for(int i = 1; i < l.size(); i++) {
                             addFirst(s, l.get(i));
-                            if(!hasEpsilon(l.get(i)))
+                            if(!hasEmpty(l.get(i)))
                                 break;
                         }
                     }
                 }
             }
         } while(count != countFirst());
-
     }
 
+    /**
+     * count the sum of first set
+     * use to judge if first algorithm is finished
+     */
     public int countFirst(){
         int count = 0;
         for(String s: firstSet.keySet()) {
@@ -55,6 +84,9 @@ public class Syntax {
         return count;
     }
 
+    /**
+     * add one terminal's first set to another
+     */
     public void addFirst(String t, String s) {
         Set<String> set = firstSet.get(s);
 //        System.out.println(set);
@@ -63,10 +95,13 @@ public class Syntax {
         }
     }
 
-    public boolean hasEpsilon(String s) {
+    /**
+     * judge if empty terminal symbol exist in "s" first set
+     */
+    public boolean hasEmpty(String s) {
         Set<String> set = firstSet.get(s);
         for(String first: set) {
-            if(first.equals("epsilon"))
+            if(first.equals("empty"))
                 return true;
         }
         return false;
@@ -76,17 +111,18 @@ public class Syntax {
         return terminal().contains(s);
     }
 
+    /**
+     * generate symbol set
+     */
     public void scanSymbol() {
         for(List<String> l: syntax) {
-            for(String s: l) {
-//                System.out.println(s);
-                if(!symbol.contains(s)) {
-                    symbol.add(s);
-                }
-            }
+            symbol.addAll(l);
         }
     }
 
+    /**
+     * generate non-terminal symbol set
+     */
     public Set<String> nonterminal() {
         Set<String> t = new HashSet<>();
         for(List<String> l: syntax) {
@@ -95,6 +131,9 @@ public class Syntax {
         return t;
     }
 
+    /**
+     * generate terminal symbol set
+     */
     public Set<String> terminal() {
         Set<String> nt = this.nonterminal();
         Set<String> t = new HashSet<>();
@@ -114,10 +153,7 @@ public class Syntax {
             String stringLine;
             while (null != (stringLine = br.readLine())) {
                 line = stringLine.split(" ");
-                List<String> list = new LinkedList<>();
-                for(int i = 0; i < line.length; i++) {
-                    list.add(line[i]);
-                }
+                List<String> list = new LinkedList<>(Arrays.asList(line));
                 syntax.add(list);
             }
 

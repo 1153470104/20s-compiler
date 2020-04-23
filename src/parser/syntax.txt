@@ -10,7 +10,7 @@ T record { D }
 X int
 X float
 C [ X ] C
-C epsilon
+C empty
 S id = E ;
 S L = E ;
 E E + E

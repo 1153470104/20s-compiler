@@ -62,11 +62,11 @@ public class TestParser {
 
     public static void testAnalyse(String filename) throws IOException {
         Lexer l1 = new Lexer(filename);
-//        for(Token t: l1.tokens) {
-//            System.out.print(t.line + "      \t");
-//            System.out.print(t + "      \t");
-//            System.out.println(t.element());
-//        }
+        for(Token t: l1.tokens) {
+            System.out.print(t.line + "      \t");
+            System.out.print(t + "      \t");
+            System.out.println(t.element());
+        }
 
         Parser p = new Parser();
         System.out.println(p.syntaxStuff.firstSet);
@@ -81,7 +81,7 @@ public class TestParser {
         }
 
         p.createChart();
-        p.printDiagram();
+//        p.printDiagram();
 
         p.analyse(l1.tokens);
         p.firstNode.printNode(0);

@@ -71,7 +71,7 @@ public class Word extends Token {
             case 284:
                 return "RIGHTCURLY, " + lexeme;
             case 285:
-                return "SEMICOLUMN, " + lexeme;
+                return "SEMICOLON, " + lexeme;
 
             case 286:
                 return "THEN, " + lexeme;
@@ -111,7 +111,7 @@ public class Word extends Token {
         rightparen = new Word(")", Tag.RIGHTPAREN),
         leftcurly = new Word("{", Tag.LEFTCURLY),
         rightcurly = new Word("}", Tag.RIGHTCURLY),
-        semicolumn = new Word(";", Tag.SEMICOLUMN),
+        semicolon = new Word(";", Tag.SEMICOLON),
         plus = new Word("+", Tag.PLUS),
         sub = new Word("-", Tag.SUB),
         multi = new Word("*", Tag.MULTI),

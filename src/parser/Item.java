@@ -13,6 +13,21 @@ public class Item {
         this.lookahead = lookahead;
     }
 
+    /**
+     * judge if item next is an empty production
+     */
+    public boolean ifItemNextEmpty(Set<List<String>> syntax) {
+        if(item >= units.size()) {
+            return false;
+        }
+        for(List<String> l: syntax) {
+            if(l.get(0).equals(this.units.get(item)) && l.get(1).equals("empty")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** return the next status of this item */
     public Item afterItem() {
         if(units.size() <= item)

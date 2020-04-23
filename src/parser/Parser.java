@@ -8,13 +8,20 @@ import java.util.*;
 public class Parser {
     public List<ItemSet> allSet = new LinkedList<>();
     public Stack<StackUnit> stack = new Stack<>();
-//    public Syntax syntaxStuff = new Syntax("./src/parser/syntax.txt");
     public Syntax syntaxStuff = new Syntax("./src/parser/syntax.txt");
     public int[][] analysisChart;
     public List<String> symbolList = new LinkedList<>();
     public List<List<String>> syntaxList = new LinkedList<>();
     public Node firstNode;
     List<ErrorInfo> errors = new LinkedList<>();
+
+    public void printStack() {
+        System.out.print("-------------stack: ");
+        for(int i = 0; i < stack.size(); i++) {
+            System.out.print(stack.get(i).element.nodeSymbol.element() + " ");
+        }
+        System.out.println();
+    }
 
     public Node getTokenToNode(List<Token> inputList, int tokenIndex) {
         Node peek;
@@ -34,17 +41,19 @@ public class Parser {
         StackUnit first = new StackUnit(0, new Node(new Word("$", '$'), new LinkedList<Node>()));
         stack.push(first);
 
-        Node temp;
-        temp = getTokenToNode(inputList, tokenIndex);
+        // add very first input token
+        Node temp = getTokenToNode(inputList, tokenIndex);
         line = temp.nodeSymbol.line;
         int indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
         operation = analysisChart[stack.peek().status][indexOfPeek];
 
+        //main iteration
         while(true) {
             System.out.println("symbol: " + temp.nodeSymbol);
             System.out.println("status: " + stack.peek().status);
             System.out.println("operation: " + operation);
             System.out.println("tokenIndex: " + tokenIndex);
+            printStack();
 
             //当出错的时候
             if(operation > 500) {
@@ -54,6 +63,7 @@ public class Parser {
             if(operation >= 0) {
                 stack.push(new StackUnit(operation, temp));
 
+                //use analysisChart, get next operation
                 tokenIndex += 1;
                 temp = getTokenToNode(inputList, tokenIndex);
                 indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
@@ -61,15 +71,39 @@ public class Parser {
 
             //需要归约的时候
             } else if(operation != -1000) {
+                //get the reduce max length
                 int reduce = syntaxList.get(-1 * operation).size() - 1;
+                List<String> product = syntaxList.get(-1 * operation);
+                boolean canEmptyOrNot = syntaxStuff.evolveEmpty(product);
+//                for(int i = reduce - 1; i < reduce; i++) {
+//                    if(stack.get(0).element.nodeSymbol.element().equals(
+//                            syntaxList.get(-1 * operation).get(0))){
+//                        reduce = i;
+//                        break;
+//                    }
+//                }
+
 //                System.out.println("-------------------- reduce: " + reduce);
-                Word ww = new Word(syntaxList.get(-1 * operation).get(0), Tag.NONTERMINAL);
+                Word ww = new Word(product.get(0), Tag.NONTERMINAL);
                 ww.line = line;
                 Node n = new Node(ww, new LinkedList<Node>());
-                for(int i = 0; i < reduce; i++) {
+//                for(int i = 0; i < reduce; i++) {
+//                    String s = stack.peek().element.nodeSymbol.element();
+//                    n.nodeSet.add(stack.peek().element);
+//                    stack.pop();
+//                }
+                int popCount = 0;
+                while(popCount < product.size() - 1) {
+                    String s = stack.peek().element.nodeSymbol.element();
                     n.nodeSet.add(stack.peek().element);
                     stack.pop();
+                    String p;
+                    do {
+                        p = product.get(product.size() - popCount - 1);
+                        popCount += 1;
+                    }while(!p.equals(s) && syntaxStuff.canEmpty(p));
                 }
+
                 int indexOfNt = symbolList.indexOf(n.nodeSymbol.element());
                 int prevstatus = stack.peek().status;
                 operation = analysisChart[prevstatus][indexOfNt];
@@ -80,7 +114,7 @@ public class Parser {
             } else {
                 Word ww = new Word("P", Tag.NONTERMINAL);
                 ww.line = line;
-                firstNode = new Node(ww, new LinkedList<Node>());
+                firstNode = new Node(ww, new LinkedList<>());
                 firstNode.nodeSet.add(stack.peek().element);
                 break;
             }
@@ -118,7 +152,7 @@ public class Parser {
         return 8888;
     }
     /**
-     * 接下来指定LR分析表的读取规则
+     * create a Action-Goto chart with item sets
      */
     public void createChart() {
         analysisChart = new int[allSet.size()][symbolList.size()];
@@ -174,11 +208,16 @@ public class Parser {
             Set<Item> modifySet = new HashSet<>();
             //iterate every item in item set
             for (Item i: s.itemSet) {
-                //System.out.print("try: ");s.printSet();
+                //add special case of empty production
+                //这里的操作会使得我原本出栈的逻辑失效。。。实现越来越不普适。。还好只有这一个empty
+                if(i.ifItemNextEmpty(syntaxList)) {
+                    modifySet.add(i.afterItem());
+                }
+
                 //if the unit next is not terminal
                 if (i.ifNonTerminalNext(nt)) {
                     for (List<String> l : syntaxList) {
-//                        if(!s.containsList(l)) {
+
                             //add new item into this item set
                             if (l.get(0).equals(i.units.get(i.item))) {
                                 String nextNext = i.nextNextUnit();
@@ -186,14 +225,15 @@ public class Parser {
                                     modifySet.add(new Item(l,1, i.lookahead));
                                 else {
                                     for (String first : firstMap.get(nextNext)) {
-                                        if (first.equals("epsilon"))
+                                        if (first.equals("empty")) {
+                                            //因为在计算first集的时候已经计算过一遍了。。。？？
                                             modifySet.add(new Item(l, 1, i.lookahead));
-                                        else
+                                        } else {
                                             modifySet.add(new Item(l, 1, first));
+                                        }
                                     }
                                 }
                             }
-//                        }
                     }
                 }
 //                System.out.print("try: ");s.printSet();
@@ -202,6 +242,7 @@ public class Parser {
             for(Item i: modifySet) {
                 s.addItem(i);
             }
+
         } while(setSize != s.itemSet.size());
 
 //        System.out.println("set size: " + setSize);
@@ -221,7 +262,8 @@ public class Parser {
         newSet.sourceItemSet.add(new ItemSet.GotoItem(x, s));
         if(newSet.itemSet.size() == 0) {
             return null;
-        }return newSet;
+        }
+        return newSet;
     }
     /** the main parse method */
     public void parse(ItemSet veryFirst) {
@@ -264,8 +306,8 @@ public class Parser {
 
     /** print the analysis diagram */
     public void printDiagram() {
-        for(int k = 0; k < symbolList.size(); k++) {
-            System.out.print(symbolList.get(k) + "\t");
+        for (String s : symbolList) {
+            System.out.print(s + "\t");
         }
         System.out.println();
         for(int i = 0; i < allSet.size(); i++) {
@@ -276,7 +318,7 @@ public class Parser {
         }
     }
 
-    class StackUnit {
+    static class StackUnit {
         public int status;
         public Node element;
 
@@ -286,7 +328,7 @@ public class Parser {
         }
     }
 
-    class ErrorInfo {
+    static class ErrorInfo {
         public int line;
         public String errorInfo;
 
@@ -295,4 +337,5 @@ public class Parser {
             this.errorInfo = errorInfo;
         }
     }
+
 }
