@@ -28,7 +28,7 @@ public class Parser {
         if(tokenIndex == inputList.size()) {
             peek = new Node(new Word("$", '$'), new LinkedList<Node>());
             peek.nodeSymbol.line = inputList.get(inputList.size()-1).line;
-        }else {
+        } else {
             peek = new Node(inputList.get(tokenIndex), new LinkedList<Node>());
         }
         return peek;
@@ -49,11 +49,13 @@ public class Parser {
 
         //main iteration
         while(true) {
+            printStack();
             System.out.println("symbol: " + temp.nodeSymbol);
             System.out.println("status: " + stack.peek().status);
             System.out.println("operation: " + operation);
             System.out.println("tokenIndex: " + tokenIndex);
-            printStack();
+            System.out.println();
+
 
             //当出错的时候
             if(operation > 500) {
@@ -72,6 +74,8 @@ public class Parser {
             //需要归约的时候
             } else if(operation != -1000) {
                 //get the reduce max length
+                //一个致命悬疑bug，在用正负性区分类别的时候一定要小心 0 的存在！！
+                operation = operation + 5;
                 int reduce = syntaxList.get(-1 * operation).size() - 1;
                 List<String> product = syntaxList.get(-1 * operation);
                 boolean canEmptyOrNot = syntaxStuff.evolveEmpty(product);
@@ -106,6 +110,7 @@ public class Parser {
 
                 int indexOfNt = symbolList.indexOf(n.nodeSymbol.element());
                 int prevstatus = stack.peek().status;
+                //give a new operation of the non-terminal symbol
                 operation = analysisChart[prevstatus][indexOfNt];
                 temp = n;
                 tokenIndex -= 1;
@@ -172,7 +177,7 @@ public class Parser {
                         String indexSymbol = everyItem.lookahead;
                         int syntaxIndex = indexOfSyntax(everyItem.units);
                         analysisChart[i][symbolList.indexOf(indexSymbol)]
-                                = -1 * syntaxIndex;
+                                = -1 * syntaxIndex - 5;
                     }
                 //跳转的条目
                 } else {
@@ -293,9 +298,11 @@ public class Parser {
                 //allSet.get(count).printSet()
                 if(!deleteOrNot) {
                     for (String x : syntaxStuff.symbol) {
-                        ItemSet iset = Goto(allSet.get(count), x);
-                        if (iset != null) {
-                            allSet.add(iset);
+                        if(!x.equals("empty")) {
+                            ItemSet iset = Goto(allSet.get(count), x);
+                            if (iset != null) {
+                                allSet.add(iset);
+                            }
                         }
                     }
                     count += 1;

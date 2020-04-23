@@ -11,4 +11,6 @@ call func ( a , b )
 
 if ( true ) then a = 9; else b = 7;
 
+int j;
+
 

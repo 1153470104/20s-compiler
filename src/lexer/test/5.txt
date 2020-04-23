@@ -1,1 +1,1 @@
-while ( true ) do a = 5;
+if ( true ) then a = 9;

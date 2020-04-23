@@ -92,8 +92,8 @@ public class TestParser {
 //        testSyntax();
 //        testParse();
 //        testChart();
-        testAnalyse("./src/lexer/test/2.txt");
-//        testAnalyse("./src/lexer/test/4.txt");
+//        testAnalyse("./src/lexer/test/2.txt");
+        testAnalyse("./src/lexer/test/4.txt");
 //        testAnalyse("./src/lexer/test/5.txt");
 //        testAnalyse("./src/lexer/test/6.txt");
 //        testAnalyse("./src/lexer/test/2.txt");

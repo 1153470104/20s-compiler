@@ -1,6 +1,8 @@
 P P'
 P' D
 P' S
+P' D S
+P' S D
 S S S
 D D D
 proc id ; D S
