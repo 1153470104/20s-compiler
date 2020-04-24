@@ -1,2 +1,4 @@
 while ( a < 8 ) do x = 1;
+int k;
+while ( a < 8 ) do x = 1;
 /* 一直都不对，知道我把while换成了return，这个式子就能够得出正确解答了。。。 */

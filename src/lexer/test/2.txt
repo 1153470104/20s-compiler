@@ -13,4 +13,6 @@ if ( true ) then a = 9; else b = 7;
 
 int j;
 
+while ( a < 8 ) do x = 1;
+
 

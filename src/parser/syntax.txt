@@ -1,10 +1,10 @@
 P P'
 P' D
 P' S
-P' D S
-P' S D
 S S S
 D D D
+S D S
+S S D
 proc id ; D S
 D T id ;
 T X C
