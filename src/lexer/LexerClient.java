@@ -1,7 +1,7 @@
 package lexer;
 
 
-public class TestLexer {
+public class LexerClient {
 
     public static void test1() {
         Lexer l1 = new Lexer("./src/lexer/test/1.txt");
@@ -30,6 +30,12 @@ public class TestLexer {
             System.out.println(t.element());
         }
     }
+
+    public static String tokens(String filename) {
+        Lexer l1 = new Lexer(filename);
+        return l1.tokenString();
+    }
+
     public static void main(String[] args) {
         //System.out.println("hexadecimal test: " + Character.digit('F', 16));
         //test1();

@@ -56,10 +56,13 @@ public class Parser {
             System.out.println("tokenIndex: " + tokenIndex);
             System.out.println();
 
-
             //当出错的时候
-            if(operation > 500) {
+            if(operation == 1000) {
                 errors.add(new ErrorInfo(inputList.get(tokenIndex).line, "syntax error!"));
+                tokenIndex += 1;
+                temp = getTokenToNode(inputList, tokenIndex);
+                indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
+                operation = analysisChart[stack.peek().status][indexOfPeek];
             }
             //需要移入的时候
             if(operation >= 0) {
@@ -345,4 +348,10 @@ public class Parser {
         }
     }
 
+    public void errorPrint() {
+        System.out.println("The Error: ");
+        for(ErrorInfo e: errors) {
+            System.out.println("Error "+ "[" + e.line + "]" + ": " + e.errorInfo);
+        }
+    }
 }

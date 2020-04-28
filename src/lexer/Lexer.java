@@ -53,6 +53,18 @@ public class Lexer {
             }
         }
     }
+
+    public String tokenString() {
+        StringBuffer sb = new StringBuffer();
+        for(Token t: tokens) {
+            if(t.tag < 256) {
+                sb.append("< ").append((char) t.tag).append(" >\n");
+            } else {
+                sb.append("< ").append(t).append(" >\n");
+            }
+        }
+        return sb.toString();
+    }
     
     public void errorPrint() {
         for(ErrorInfo e: errors) {

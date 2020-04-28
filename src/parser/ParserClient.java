@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-public class TestParser {
+public class ParserClient {
 
     public static void testSyntax() throws IOException {
         Syntax s = new Syntax("./src/parser/syntax.txt");
@@ -85,6 +85,7 @@ public class TestParser {
 
         p.analyse(l1.tokens);
         p.firstNode.printNode(0);
+        p.errorPrint();
     }
 
     public static void main(String[] args) throws IOException {
@@ -93,8 +94,8 @@ public class TestParser {
 //        testParse();
 //        testChart();
 //        testAnalyse("./src/lexer/test/2.txt");
-        testAnalyse("./src/lexer/test/4.txt");
-//        testAnalyse("./src/lexer/test/5.txt");
+//        testAnalyse("./src/lexer/test/4.txt");
+        testAnalyse("./src/lexer/test/5.txt");
 //        testAnalyse("./src/lexer/test/6.txt");
 //        testAnalyse("./src/lexer/test/2.txt");
     }
