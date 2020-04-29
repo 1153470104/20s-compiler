@@ -85,7 +85,7 @@ public class ParserClient {
 
         p.analyse(l1.tokens);
         p.firstNode.printNode(0);
-        p.errorPrint();
+        p.errors.errorPrint();
     }
 
     public static void main(String[] args) throws IOException {

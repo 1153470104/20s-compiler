@@ -1,1 +1,3 @@
-if ( true ) then then a = 9;
+if ( true  then) then a = 9;
+b = b - 3;
+b = b 4;

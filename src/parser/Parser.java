@@ -13,7 +13,7 @@ public class Parser {
     public List<String> symbolList = new LinkedList<>();
     public List<List<String>> syntaxList = new LinkedList<>();
     public Node firstNode;
-    List<ErrorInfo> errors = new LinkedList<>();
+    public Errors errors;
 
     public void printStack() {
         System.out.print("-------------stack: ");
@@ -57,8 +57,8 @@ public class Parser {
             System.out.println();
 
             //当出错的时候
-            if(operation == 1000) {
-                errors.add(new ErrorInfo(inputList.get(tokenIndex).line, "syntax error!"));
+            if(operation > 500) {
+                errors.addError(operation, temp.nodeSymbol.line, stack.peek().status, analysisChart, temp.nodeSymbol.element());
                 tokenIndex += 1;
                 temp = getTokenToNode(inputList, tokenIndex);
                 indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
@@ -194,6 +194,8 @@ public class Parser {
                 }
             }
         }
+        errors = new Errors(symbolList);
+        errors.setChart(analysisChart);
     }
 
     public Parser() throws IOException {
@@ -338,20 +340,4 @@ public class Parser {
         }
     }
 
-    static class ErrorInfo {
-        public int line;
-        public String errorInfo;
-
-        public ErrorInfo(int line, String errorInfo) {
-            this.line = line;
-            this.errorInfo = errorInfo;
-        }
-    }
-
-    public void errorPrint() {
-        System.out.println("The Error: ");
-        for(ErrorInfo e: errors) {
-            System.out.println("Error "+ "[" + e.line + "]" + ": " + e.errorInfo);
-        }
-    }
 }
