@@ -70,9 +70,12 @@ public class ParserClient {
 
         Parser p = new Parser();
         System.out.println(p.syntaxStuff.firstSet);
-        Item i = new Item(List.of("P", "P'"), 1, "$");
+//        Item i = new Item(List.of("P", "P'"), 1, "$");
+        Item i = new Item(List.of("Program", "P"), 1, "$");
         ItemSet set = new ItemSet();
         set.addItem(i);
+
+//        System.out.println("1/////////////////////");
 
         p.parse(set);
         for(int j = 0; j < p.allSet.size(); j++) {
@@ -80,8 +83,9 @@ public class ParserClient {
             p.allSet.get(j).printSet();
         }
 
+//        System.out.println("2/////////////////////");
         p.createChart();
-//        p.printDiagram();
+        p.printDiagram();
 
         p.analyse(l1.tokens);
         p.firstNode.printNode(0);
@@ -95,8 +99,8 @@ public class ParserClient {
 //        testChart();
 //        testAnalyse("./src/lexer/test/2.txt");
 //        testAnalyse("./src/lexer/test/4.txt");
-        testAnalyse("./src/lexer/test/5.txt");
-//        testAnalyse("./src/lexer/test/6.txt");
+//        testAnalyse("./src/lexer/test/5.txt");
+        testAnalyse("./src/lexer/test/6.txt");
 //        testAnalyse("./src/lexer/test/2.txt");
     }
 }

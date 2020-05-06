@@ -1,0 +1,10 @@
+{}
+{offset = 0}
+
+
+
+
+
+
+{enter(id.lexeme,T.type,offset);offset = offset+T.width;}
+{t=X.type;w=B.width;}

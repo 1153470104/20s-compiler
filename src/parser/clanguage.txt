@@ -1,0 +1,58 @@
+Program P
+P D P
+P S P
+P empty
+D T id A ;
+D record id { P }
+A = F A
+A empty
+A , id A
+T X C
+X int
+X float
+C [ num ] C
+C empty
+S L = E ;
+S if B then S else S
+S while B do S
+E G E'
+E' + G E'
+E' empty
+G F G'
+G' * F G'
+G' empty
+F ( E )
+F id
+F digit
+L id L'
+L' [ num ] L'
+L' empty
+S for ( id = E ; B ; id V ) { S }
+N empty
+B H B'
+B' or H B'
+B' empty
+H I H'
+H' and I H'
+H' empty
+I not B
+I ( B )
+I E relop E
+I true
+I false
+relop <
+relop <=
+relop ==
+relop !=
+relop >
+relop >=
+D proc X id ( M ) { P }
+M X id M'
+M empty
+M' , X id M'
+M' empty
+S call id ( Elist ) ;
+S return E ;
+Elist E Elist'
+Elist' , E Elist'
+Elist' empty
