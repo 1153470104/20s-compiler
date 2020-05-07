@@ -27,6 +27,7 @@ F num
 F digit
 L id L'
 L' [ num ] L'
+L' [ id ] L'
 L' empty
 S for ( id = E ; B ; id V ) { S }
 N empty

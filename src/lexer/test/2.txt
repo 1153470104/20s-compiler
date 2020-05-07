@@ -1,12 +1,17 @@
 y = 8 + i;
 z = 6 * 8;
 
+
+int j ;
+float k;
+k = 0;
+
 a[1] = s;
+record { int i; } k;
+
 a[1][4] = 2;
 
 z = b[a];
-
-
 call func ( a , b )
 
 if ( true ) then a = 9; else b = 7;

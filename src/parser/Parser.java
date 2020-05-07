@@ -57,7 +57,7 @@ public class Parser {
             System.out.println();
 
             //当出错的时候
-            if(operation > 500) {
+            if(operation > 5000) {
                 errors.addError(operation, temp.nodeSymbol.line, stack.peek().status, analysisChart, temp.nodeSymbol.element());
                 tokenIndex += 1;
                 temp = getTokenToNode(inputList, tokenIndex);
@@ -75,7 +75,7 @@ public class Parser {
                 operation = analysisChart[stack.peek().status][indexOfPeek];
 
             //需要归约的时候
-            } else if(operation != -1000) {
+            } else if(operation != -10000) {
                 //get the reduce max length
                 //一个致命悬疑bug，在用正负性区分类别的时候一定要小心 0 的存在！！
                 operation = operation + 5;
@@ -166,7 +166,7 @@ public class Parser {
         analysisChart = new int[allSet.size()][symbolList.size()];
         for(int ii = 0; ii < allSet.size(); ii++) {
             for(int jj = 0; jj < symbolList.size(); jj++) {
-                analysisChart[ii][jj] = 1000;
+                analysisChart[ii][jj] = 10000;
             }
         }
 
@@ -175,7 +175,7 @@ public class Parser {
                 //acc和回收的条目
                 if(everyItem.item == everyItem.units.size()) {
                     if(everyItem.units.get(0).equals("P")) {
-                        analysisChart[i][symbolList.indexOf("$")] = -1000;
+                        analysisChart[i][symbolList.indexOf("$")] = -10000;
                     } else {
                         String indexSymbol = everyItem.lookahead;
                         int syntaxIndex = indexOfSyntax(everyItem.units);

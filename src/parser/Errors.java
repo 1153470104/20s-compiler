@@ -30,7 +30,7 @@ public class Errors {
         int length = chart[0].length;
         int count = 0;
         for (int i = 0; i < length; i++) {
-            if (chart[row][i] > 500) {
+            if (chart[row][i] > 5000) {
                 count++;
             }
         }
@@ -44,7 +44,7 @@ public class Errors {
         int length = chart[0].length;
         String next = "";
         for (int i = 0; i < length; i++) {
-            if (chart[row][i] > 500) {
+            if (chart[row][i] > 5000) {
                 next = symbolList.get(i);
             }
         }
@@ -101,7 +101,7 @@ public class Errors {
     public void setRow(int row, int[][] chart, int errorNum) {
         int length = chart[0].length;
         for(int i = 0; i < length; i++) {
-            if(chart[row][i] > 500) {
+            if(chart[row][i] > 5000) {
                 chart[row][i] = errorNum;
             }
         }
@@ -120,15 +120,15 @@ public class Errors {
             //这里只能决定在表格内采取什么样的措施，而不能让表格内直接填上错误内容
             //错误内容是放在另一个method里面的
             if(operator) {
-                setRow(i, chart, 601);
+                setRow(i, chart, 6001);
             } else if(component) {
-                setRow(i, chart, 602);
+                setRow(i, chart, 6002);
             } else if(right) {
-            setRow(i, chart, 603);
+            setRow(i, chart, 6003);
             } else if(relop) {
-                setRow(i, chart, 604);
+                setRow(i, chart, 6004);
             } else if(reserve) {
-                setRow(i, chart, 605);
+                setRow(i, chart, 6005);
             }
         }
         int endOrder = symbolList.indexOf("$");
@@ -136,15 +136,16 @@ public class Errors {
         int lcOrder = symbolList.indexOf("[");
         int lpOrder = symbolList.indexOf("{");
         for(int j = 0; j < height; j ++) {
-            if(existType(j, chart, "rightBrackets") && chart[j][endOrder] > 500) {
-                chart[j][endOrder] = 606;
+            if(existType(j, chart, "rightBrackets") && chart[j][endOrder] > 5000) {
+                chart[j][endOrder] = 6006;
             }
-            if(chart[j][lbOrder] > 500)
-                chart[j][lbOrder] = 607;
-            if(chart[j][lbOrder] > 500)
-                chart[j][lcOrder] = 608;
-            if(chart[j][lbOrder] > 500)
-                chart[j][lpOrder] = 609;
+            if(chart[j][lbOrder] > 5000)
+                chart[j][lbOrder] = 6007;
+            //盲目复制代码导致的问题。。。
+            if(chart[j][lcOrder] > 5000)
+                chart[j][lcOrder] = 6008;
+            if(chart[j][lpOrder] > 5000)
+                chart[j][lpOrder] = 6009;
         }
 
     }
@@ -155,31 +156,31 @@ public class Errors {
             onlyOne = theOnlyOne(row, chart);
         }
         switch (code){
-            case 601:
+            case 6001:
                 errors.add(new ErrorInfo(line, errorMessage.get(0) + " " + onlyOne));
                 break;
-            case 602:
+            case 6002:
                 errors.add(new ErrorInfo(line, errorMessage.get(1) + " " + onlyOne));
                 break;
-            case 603:
+            case 6003:
                 errors.add(new ErrorInfo(line, errorMessage.get(2) + " " + onlyOne));
                 break;
-            case 604:
+            case 6004:
                 errors.add(new ErrorInfo(line, errorMessage.get(3) + " " + onlyOne));
                 break;
-            case 605:
+            case 6005:
                 errors.add(new ErrorInfo(line, errorMessage.get(4) + " " + onlyOne));
                 break;
-            case 606:
+            case 6006:
                 errors.add(new ErrorInfo(line, errorMessage.get(5)));
                 break;
-            case 607:
+            case 6007:
                 errors.add(new ErrorInfo(line, errorMessage.get(6)));
                 break;
-            case 608:
+            case 6008:
                 errors.add(new ErrorInfo(line, errorMessage.get(7)));
                 break;
-            case 609:
+            case 6009:
                 errors.add(new ErrorInfo(line, errorMessage.get(8)));
                 break;
 

@@ -70,8 +70,7 @@ public class ParserClient {
 
         Parser p = new Parser();
         System.out.println(p.syntaxStuff.firstSet);
-        Item i = new Item(List.of("P", "P'"), 1, "$");
-//        Item i = new Item(List.of("Program", "P"), 1, "$");
+        Item i = new Item(List.of("Program", "P"), 1, "$");
         ItemSet set = new ItemSet();
         set.addItem(i);
 

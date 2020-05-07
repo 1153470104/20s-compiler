@@ -1,6 +1,6 @@
-P P'
-P' D
-P' S
+Program P
+P D
+P S
 S S S
 D D D
 S D S
