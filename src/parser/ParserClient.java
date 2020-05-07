@@ -70,8 +70,8 @@ public class ParserClient {
 
         Parser p = new Parser();
         System.out.println(p.syntaxStuff.firstSet);
-//        Item i = new Item(List.of("P", "P'"), 1, "$");
-        Item i = new Item(List.of("Program", "P"), 1, "$");
+        Item i = new Item(List.of("P", "P'"), 1, "$");
+//        Item i = new Item(List.of("Program", "P"), 1, "$");
         ItemSet set = new ItemSet();
         set.addItem(i);
 
@@ -97,10 +97,10 @@ public class ParserClient {
 //        testSyntax();
 //        testParse();
 //        testChart();
-//        testAnalyse("./src/lexer/test/2.txt");
+        testAnalyse("./src/lexer/test/2.txt");
 //        testAnalyse("./src/lexer/test/4.txt");
 //        testAnalyse("./src/lexer/test/5.txt");
-        testAnalyse("./src/lexer/test/6.txt");
+//        testAnalyse("./src/lexer/test/6.txt");
 //        testAnalyse("./src/lexer/test/2.txt");
     }
 }

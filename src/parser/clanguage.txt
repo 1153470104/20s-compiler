@@ -23,6 +23,7 @@ G' * F G'
 G' empty
 F ( E )
 F id
+F num
 F digit
 L id L'
 L' [ num ] L'

@@ -1,4 +1,3 @@
 int j ;
-int[8] j;
 float k;
 k = 0;

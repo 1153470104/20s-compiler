@@ -8,7 +8,7 @@ import java.util.*;
 public class Parser {
     public List<ItemSet> allSet = new LinkedList<>();
     public Stack<StackUnit> stack = new Stack<>();
-    public Syntax syntaxStuff = new Syntax("./src/parser/clanguage.txt");
+    public Syntax syntaxStuff = new Syntax("./src/parser/syntax.txt");
     public int[][] analysisChart;
     public List<String> symbolList = new LinkedList<>();
     public List<List<String>> syntaxList = new LinkedList<>();
