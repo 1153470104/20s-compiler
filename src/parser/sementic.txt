@@ -1,10 +1,64 @@
-{}
-{offset = 0}
+null
+offset = 0
+label(S.next);
+S.next=newlabel();
+null
+M3.next=newlabel();
+label(S1.next); M4.next=S.next;
+
+enter(id.lexeme,T.type,offset); offset = offset+T.width;
+T.type=C.type; T.width=C.width;
+t=X.type; w=X.width;
+
+X.type=int; X.width=4;
+X.type=float; X.width=8;
+C.type=array(num.val, C1.type); C.width=num.val*C1.width;
+C.type=t; C.width=w;
+p=lookup(id.lexeme); if(p == null then error); S.code=E.code || gen(p = E.addr);
+gen(L.array[L.offset]=E.addr);
+E.addr=newtemp(); E.code=E1.code || E2.code || gen(E.addr=E1.addr+E2.addr);
+E.addr=newtemp(); E.code=E1.code || E2.code || gen(E.addr=E1.addr*E2.addr);
+E.addr=newtemp(); E.code=E1.code || gen(E.addr= minus E1.addr);
+E.addr=E1.addr; E.code=E1.code;
+E.addr=lookup(id.lexeme); if E.addr==null then error; E.code='';
+E.addr=digit.val;
+E.addr=num.val;
+E.addr = newtemp(); gen( E.addr=L. array[L.offset] );
+L.array=lookup(id.lexeme); if L.array==null then error; L.type = L.array.type.elem ; L.offset = newtemp(); gen( L.offset=E.addr*L.type.width );
+L.array = L1. array; L.type = L1.type.elem ; t = newtemp(); gen( t=E.addr*L.type.width ); L.offset = newtemp(); gen( L.offset=L1.offset+t );
+null
+M5.true=newlabel(); M5.false=S.next;
+label(B.true); M6.next=S.next;
+null
+M7.true=newlabel(); M7.false=S.next;
+label(B.true); M8.next=S.next;
+gen(goto S.next)
+label(B.false); M10.next=S.next;
+gen(goto B.begin);
+M11.begin=newlabel(); label(M11.begin); M11.true=newlabel(); M11.false=S.next;
+label(B.true); S1.next=B.begin;
+null
+M15.true=B.true; M15.false=newlabel();
+label(B1.false); M16.true=B.true; M16.false=B.false;
+null
+M17.false=B.false; M17.true=newlabel();
+label(B1.false); M18.true=B.true; M18.false=B.false;
+null
+M13.true=B.false; M13.false=B.true;
+null
+M13.true=B.true; M13.false=B.false;
+gen(if E1.addr relop E2.addr goto B.true); gen(goto B.false);
+gen(goto B.true);
+gen(goto B.false);
+null
+null
+null
+null
+null
+null
+n=0; for t in q  do {gen(‘param’ t ); n = n+1;} gen(‘call’ id.addr ‘,’ n);
+initiate q, with only E.addr;
+add E.addr to q's tail
 
 
 
-
-
-
-{enter(id.lexeme,T.type,offset);offset = offset+T.width;}
-{t=X.type;w=B.width;}

@@ -11,7 +11,7 @@ T X C
 T record { D }
 X int
 X float
-C [ X ] C
+C [ num ] C
 C empty
 S id = E ;
 S L = E ;
@@ -22,6 +22,7 @@ E E - E
 E ( E )
 E id
 E digit
+E num
 E L
 L id [ E ]
 L L [ E ]

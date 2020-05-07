@@ -1,0 +1,64 @@
+Program P
+P D
+P M2 S
+M2 empty
+S S S
+M3 empty
+M4 empty
+D D D
+S D S
+S S D
+proc id ; D S
+D T id ;
+T X M1 C
+M1 empty
+T record { D }
+X int
+X float
+C [ num ] C
+C empty
+S id = E ;
+S L = E ;
+E E + E
+E E * E
+E - E
+E ( E )
+E id
+E digit
+E num
+E L
+L id [ E ]
+L L [ E ]
+S if M5 B then M6 S
+M5 empty
+M6 empty
+S if M7 B then M8 S M9 else M10 S
+M7 empty
+M8 empty
+M9 empty
+M10 empty
+S while M11 B do M12 S
+M11 empty
+M12 empty
+B M15 B or M16 B
+M15 empty
+M16 empty
+B M17 B and M18 B
+M17 empty
+M18 empty
+B not M14 B
+M14 empty
+B ( M13 B )
+M13 empty
+B E relop E
+B true
+B false
+relop <
+relop <=
+relop ==
+relop !=
+relop >
+relop >=
+S call id ( Elist )
+Elist Elist , E
+Elist E
