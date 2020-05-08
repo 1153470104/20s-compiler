@@ -77,14 +77,14 @@ public class ParserClient {
 //        System.out.println("1/////////////////////");
 
         p.parse(set);
-//        for(int j = 0; j < p.allSet.size(); j++) {
-//            System.out.println();
-//            p.allSet.get(j).printSet();
-//        }
+        for(int j = 0; j < p.allSet.size(); j++) {
+            System.out.println();
+            p.allSet.get(j).printSet();
+        }
 
 //        System.out.println("2/////////////////////");
         p.createChart();
-//        p.printDiagram();
+        p.printDiagram();
 
         p.analyse(l1.tokens);
         p.firstNode.printNode(0);

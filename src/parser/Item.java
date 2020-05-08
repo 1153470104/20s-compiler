@@ -32,6 +32,9 @@ public class Item {
     public Item afterItem() {
         if(units.size() <= item)
             return null;
+        if(units.get(1).equals("empty")) {
+            return null;
+        }
         return new Item(this.units, (this.item + 1), lookahead);
     }
 

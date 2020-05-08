@@ -8,7 +8,7 @@ import java.util.*;
 public class Parser {
     public List<ItemSet> allSet = new LinkedList<>();
     public Stack<StackUnit> stack = new Stack<>();
-    public Syntax syntaxStuff = new Syntax("./src/parser/newsyntax.txt");
+    public Syntax syntaxStuff = new Syntax("./src/parser/clanguage.txt");
     public int[][] analysisChart;
     public List<String> symbolList = new LinkedList<>();
     public List<List<String>> syntaxList = new LinkedList<>();
@@ -93,6 +93,7 @@ public class Parser {
 //                System.out.println("-------------------- reduce: " + reduce);
                 Word ww = new Word(product.get(0), Tag.NONTERMINAL);
                 ww.line = line;
+                //新建一个node用来存储内容
                 Node n = new Node(ww, new LinkedList<Node>());
 //                for(int i = 0; i < reduce; i++) {
 //                    String s = stack.peek().element.nodeSymbol.element();
@@ -100,15 +101,22 @@ public class Parser {
 //                    stack.pop();
 //                }
                 int popCount = 0;
-                while(popCount < product.size() - 1) {
-                    String s = stack.peek().element.nodeSymbol.element();
-                    n.nodeSet.add(stack.peek().element);
-                    stack.pop();
-                    String p;
-                    do {
-                        p = product.get(product.size() - popCount - 1);
-                        popCount += 1;
-                    }while(!p.equals(s) && syntaxStuff.canEmpty(p));
+                if(product.get(1).equals("empty")) {
+                    n.nodeSet.add(new Node(new Word("empty", Tag.ID), new LinkedList<Node>()));
+                } else {
+                    while (popCount < product.size() - 1) {
+                        //上下注释掉的部分，很牛逼。。。因为原本的方案里不会把空的非终结符填入，
+                        //所以用栈顶和应当的栈顶比较，不同而且栈顶非终结符可以为空，那就改pop更前面的了
+//                    String s = stack.peek().element.nodeSymbol.element();
+                        n.nodeSet.add(stack.peek().element);
+                        stack.pop();
+                        popCount++;
+//                    String p;
+//                    do {
+//                        p = product.get(product.size() - popCount - 1);
+//                        popCount += 1;
+//                    }while(!p.equals(s) && syntaxStuff.canEmpty(p));
+                    }
                 }
 
                 int indexOfNt = symbolList.indexOf(n.nodeSymbol.element());
@@ -120,7 +128,7 @@ public class Parser {
 
             //分析结束
             } else {
-                Word ww = new Word("P", Tag.NONTERMINAL);
+                Word ww = new Word("Program", Tag.NONTERMINAL);
                 ww.line = line;
                 firstNode = new Node(ww, new LinkedList<>());
                 firstNode.nodeSet.add(stack.peek().element);
@@ -173,8 +181,8 @@ public class Parser {
         for(int i = 0; i < allSet.size(); i++) {
             for(Item everyItem: allSet.get(i).itemSet) {
                 //acc和回收的条目
-                if(everyItem.item == everyItem.units.size()) {
-                    if(everyItem.units.get(0).equals("P")) {
+                if(everyItem.item == everyItem.units.size() || everyItem.units.get(1).equals("empty")) {
+                    if(everyItem.units.get(0).equals("Program")) {
                         analysisChart[i][symbolList.indexOf("$")] = -10000;
                     } else {
                         String indexSymbol = everyItem.lookahead;
@@ -215,14 +223,19 @@ public class Parser {
         do {
             setSize = s.itemSet.size();
             //因为有concurrentModificationException, 被迫加了一个Set数据结构避免iterate时候改变
+            //store the new added items
             Set<Item> modifySet = new HashSet<>();
             //iterate every item in item set
             for (Item i: s.itemSet) {
                 //add special case of empty production
                 //这里的操作会使得我原本出栈的逻辑失效。。。实现越来越不普适。。还好只有这一个empty
-                if(i.ifItemNextEmpty(syntaxList)) {
-                    modifySet.add(i.afterItem());
-                }
+                // lab3加：
+                //问题是后面会有毛毛多empty等着
+                //这里让可能是空集的产生式 点在项目前和点在项目后的项目在一个项目集合里面
+
+//                if(i.ifItemNextEmpty(syntaxList)) {
+//                    modifySet.add(i.afterItem());
+//                }
 
                 //if the unit next is not terminal
                 if (i.ifNonTerminalNext(nt)) {

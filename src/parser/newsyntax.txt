@@ -2,7 +2,7 @@ Program P
 P D
 P M2 S
 M2 empty
-S S S
+S M3 S M4 S
 M3 empty
 M4 empty
 D D D

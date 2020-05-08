@@ -8,14 +8,14 @@ k = 0;
 /*int[9] a;*/
 
 a[1] = s;
-record { int i; } k;
+/*record { int i; } k;*/
 
 a[1][4] = 2;
 
-z = b[a];
-call func ( a , b )
+/*z = b[a];*/
+call func ( a , b ) ;
 
-/*if ( true ) then a = 9; else b = 7;*/
+if ( true ) then a = 9; else b = 7;
 
 int j;
 
