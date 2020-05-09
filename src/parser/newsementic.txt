@@ -1,0 +1,82 @@
+
+
+offset = 0
+
+
+
+enter(id.lexeme,T.type,offset); offset = offset+T.width;
+
+type='proc'; enterproc(id.lexeme, type, offset);
+
+type='record'; enterrecord(id.lexeme, type, offset);
+gen(id '=' F.addr);
+
+
+enter(id.lexeme, type, offset); offset=offset+X.offset;
+T.type=C.type; T.width=C.width;
+t=X.type; w=X.width;
+X.type=int; X.width=4;
+X.type=float; X.width=8;
+
+enter(id.lexeme, type, offset); offset=offset+X.offset;
+
+
+enter(id.lexeme, type, offset);
+
+C.type=array(num.val, C1.type); C.width=num.val*C1.width;
+C.type=t; C.width=w;
+gen(L.addr '=' E.addr);
+L.addr=lookup(id.lexeme); if L.addr = nil then error;
+backpatch(B.truelist, M9.quad); backpatch(B.falselist, M10.quad); S.nextlist=merge(merge(S1.nextlist, N.nextlist), S2.nextlist);
+N.nextlist=makelist(nextquad); gen('goto_');
+
+
+S.nextlist=B.falselist; backpatch(S1.nextlist, M11.quad); backpatch(B.truelist, M12.quad); gen('goto'M11.quad);
+
+
+E.addr = newtemp(); gen( E.addr'=' E'.addr '+' G.addr);
+E'.addr=G.addr;
+
+G.addr = newtemp(); gen( G.addr'=' G'.addr '*' F.addr);
+G'.addr=F.addr;
+
+F.addr=E.addr;
+F.addr=lookup(id.lexeme); if F.addr = nil then error;
+F.val=num.lex
+F.val=digit.lex;
+
+M5.true=newlabel(); M5.false=S.next;
+label(B.true); M6.next=S.next;
+null
+M7.true=newlabel(); M7.false=S.next;
+label(B.true); M8.next=S.next;
+gen(goto S.next)
+label(B.false); M10.next=S.next;
+gen(goto B.begin);
+M11.begin=newlabel(); label(M11.begin); M11.true=newlabel(); M11.false=S.next;
+label(B.true); S1.next=B.begin;
+null
+M15.true=B.true; M15.false=newlabel();
+label(B1.false); M16.true=B.true; M16.false=B.false;
+null
+M17.false=B.false; M17.true=newlabel();
+label(B1.false); M18.true=B.true; M18.false=B.false;
+null
+M13.true=B.false; M13.false=B.true;
+null
+M13.true=B.true; M13.false=B.false;
+gen(if E1.addr relop E2.addr goto B.true); gen(goto B.false);
+gen(goto B.true);
+gen(goto B.false);
+null
+null
+null
+null
+null
+null
+n=0; for t in q  do {gen(‘param’ t ); n = n+1;} gen(‘call’ id.addr ‘,’ n);
+initiate q, with only E.addr;
+add E.addr to q's tail
+
+
+

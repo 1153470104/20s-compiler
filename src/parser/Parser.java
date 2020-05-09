@@ -65,7 +65,7 @@ public class Parser {
                 operation = analysisChart[stack.peek().status][indexOfPeek];
             }
             //需要移入的时候
-            if(operation >= 0) {
+            else if(operation >= 0) {
                 stack.push(new StackUnit(operation, temp));
 
                 //use analysisChart, get next operation
@@ -247,7 +247,10 @@ public class Parser {
                                 if(nextNext == null || nextNext.equals("$"))
                                     modifySet.add(new Item(l,1, i.lookahead));
                                 else {
-                                    for (String first : firstMap.get(nextNext)) {
+                                    //bug 在这里，一旦一个后面跟的是一个empty 非终结符，
+                                    //而且empty终结符后面还有别的非终结符，
+                                    // 会导致某些情形的不可识别!!因为我只考虑了一个非终结符！
+                                    for (String first : syntaxStuff.nextFirstInProduct(i)) {
                                         if (first.equals("empty")) {
                                             //因为在计算first集的时候已经计算过一遍了。。。？？
                                             modifySet.add(new Item(l, 1, i.lookahead));

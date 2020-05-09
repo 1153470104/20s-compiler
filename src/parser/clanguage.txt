@@ -1,20 +1,39 @@
 Program P
-P D P
+P M1 D P
+M1 empty
 P S P
 P empty
-D T id A ;
-D record id { P }
-A = F A
+D T id M2 A ;
+M2 empty
+D proc X M3 id ( M ) { P }
+M3 empty
+D record id M4 { P }
+M4 empty
+A = F
 A empty
-A , id A
-T X C
+A , id M5 A
+M5 empty
+T X M6 C
+M6 empty
 X int
 X float
+M X id M7 M'
+M7 empty
+M empty
+M' , X id M8 M'
+M8 empty
+M' empty
 C [ num ] C
 C empty
 S L = E ;
-S if B then S else S
-S while B do S
+L id L'
+S if B then M9 S N1 else M10 S
+N1 empty
+M9 empty
+M10 empty
+S while M11 B do M12 S
+M11 empty
+M12 empty
 E G E'
 E' + G E'
 E' empty
@@ -25,7 +44,6 @@ F ( E )
 F id
 F num
 F digit
-L id L'
 L' [ num ] L'
 L' [ id ] L'
 L' empty
@@ -49,10 +67,6 @@ relop !=
 relop >
 relop >=
 D proc X id ( M ) { P }
-M X id M'
-M empty
-M' , X id M'
-M' empty
 S call id ( Elist ) ;
 S return E ;
 Elist E Elist'

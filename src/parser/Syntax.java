@@ -14,6 +14,19 @@ public class Syntax {
         this.addFirstSet();
     }
 
+    public Set<String> nextFirstInProduct(Item item) {
+        int length = item.units.size();
+        int current = item.item;
+        Set<String> bigFirstSet = new HashSet<>();
+        for(int i = current + 1; i < length; i++) {
+            bigFirstSet.addAll(firstSet.get(item.units.get(i)));
+            if(!firstSet.get(item.units.get(i)).contains("empty")) {
+                break;
+            }
+        }
+        return bigFirstSet;
+    }
+
     public boolean canEmpty(String s) {
         for(List<String> l: syntax) {
             if(l.get(0).equals(s) && l.get(1).equals("empty")) {
@@ -53,7 +66,7 @@ public class Syntax {
                 firstSet.put(s, new HashSet<>());
             }
         }
-        int count = countFirst();
+        int count;
         //then iterate to calculate non-terminal's set
          do {
             count = countFirst();

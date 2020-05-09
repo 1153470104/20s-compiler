@@ -2,7 +2,7 @@ y = 8 + i;
 z = 6 * 8;
 
 
-int j ;
+int j;
 float k;
 k = 0;
 /*int[9] a;*/
