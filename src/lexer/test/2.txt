@@ -12,7 +12,7 @@ a[1] = s;
 
 a[1][4] = 2;
 
-/*z = b[a];*/
+z = b[a];
 call func ( a , b ) ;
 
 if ( true ) then a = 9; else b = 7;

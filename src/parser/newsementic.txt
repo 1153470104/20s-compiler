@@ -25,8 +25,7 @@ enter(id.lexeme, type, offset);
 
 C.type=array(num.val, C1.type); C.width=num.val*C1.width;
 C.type=t; C.width=w;
-gen(L.addr '=' E.addr);
-L.addr=lookup(id.lexeme); if L.addr = nil then error;
+gen(L.array '[ L.offset ']' '=' E.addr);
 backpatch(B.truelist, M9.quad); backpatch(B.falselist, M10.quad); S.nextlist=merge(merge(S1.nextlist, N.nextlist), S2.nextlist);
 N.nextlist=makelist(nextquad); gen('goto_');
 
@@ -44,39 +43,35 @@ F.addr=E.addr;
 F.addr=lookup(id.lexeme); if F.addr = nil then error;
 F.val=num.lex
 F.val=digit.lex;
+E.addr = newtemp(); gen( E.addr '=' L. array '[' L.offset ']' );
+L.array=lookup(id.lexeme); if L.array = nil then error; L.offset=newtemp(); gen( L.offset'=' L'.offset );
+L'.type = L.array.type.elem ;
+L'.array = L'1. array; t = newtemp(); gen( t ‘=’ E.addr '*' L'.type.width ); L'.offset = newtemp(); gen( L'.offset '=' L'1.offset '+' t );
+L'.type = L'1.type.elem ;
+L'.offset= = 0;
 
-M5.true=newlabel(); M5.false=S.next;
-label(B.true); M6.next=S.next;
-null
-M7.true=newlabel(); M7.false=S.next;
-label(B.true); M8.next=S.next;
-gen(goto S.next)
-label(B.false); M10.next=S.next;
-gen(goto B.begin);
-M11.begin=newlabel(); label(M11.begin); M11.true=newlabel(); M11.false=S.next;
-label(B.true); S1.next=B.begin;
-null
-M15.true=B.true; M15.false=newlabel();
-label(B1.false); M16.true=B.true; M16.false=B.false;
-null
-M17.false=B.false; M17.true=newlabel();
-label(B1.false); M18.true=B.true; M18.false=B.false;
-null
-M13.true=B.false; M13.false=B.true;
-null
-M13.true=B.true; M13.false=B.false;
-gen(if E1.addr relop E2.addr goto B.true); gen(goto B.false);
-gen(goto B.true);
-gen(goto B.false);
-null
-null
-null
-null
-null
-null
-n=0; for t in q  do {gen(‘param’ t ); n = n+1;} gen(‘call’ id.addr ‘,’ n);
-initiate q, with only E.addr;
-add E.addr to q's tail
+
+backpatch(H1.falselist, M15.quad); B.truelist=merge(H1.truelist, H2.truelist); B.falselist=H2.falselist;
+M15.quad=nextquad;
+
+
+backpatch(I1.truelist, M16.quad); H.falselist=merge(I1.falselist, I2.falselist); H.truelist=I2.truelist;
+M16.quad=nextquad;
+
+I.truelist=B.falselist; I.falselist=B.truelist;
+I.truelist=B.truelistl I.falselist=B.falselist;
+I.truelist=makelist(nextquad); I.falselist=makelist(nextquad + 1); gen('if' E1.addr relop E2.addr 'goto'); gen('goto_');
+I.truelist=makelist(nextquad); gen('goto_');
+I.falselist=makelist(nextquad); gen('goto_');
 
 
 
+
+
+
+
+type='proc'; enterproc(id.lexeme, type, offset);
+n = 0; for(q 中每个t do {gen('param' t); n=n+1;}); gen('call' id.addr ',' n);
+gen('return' E.addr);
+将q初始化为只包含E.addr;
+将E.addr添加到q队尾;

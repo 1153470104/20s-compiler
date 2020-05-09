@@ -26,7 +26,6 @@ M' empty
 C [ num ] C
 C empty
 S L = E ;
-L id L'
 S if B then M9 S N1 else M10 S
 N1 empty
 M9 empty
@@ -44,16 +43,20 @@ F ( E )
 F id
 F num
 F digit
-L' [ num ] L'
-L' [ id ] L'
+E L
+L id M13 L'
+M13 empty
+L' [ E ] M14 L'
+M14 empty
 L' empty
-S for ( id = E ; B ; id V ) { S }
 N empty
 B H B'
-B' or H B'
+B' or M15 H B'
+M15 empty
 B' empty
 H I H'
-H' and I H'
+H' and M16 I H'
+M16 empty
 H' empty
 I not B
 I ( B )
@@ -66,7 +69,8 @@ relop ==
 relop !=
 relop >
 relop >=
-D proc X id ( M ) { P }
+D proc X id M17 ( M ) { P }
+M17 empty
 S call id ( Elist ) ;
 S return E ;
 Elist E Elist'
