@@ -89,6 +89,7 @@ public class Lexer {
 
         reserve(new Word("then", Tag.THEN));
         reserve(new Word("record", Tag.RECORD));
+        reserve(new Word("proc", Tag.PROC));
 
         reserve(Word.True);
         reserve(Word.False);

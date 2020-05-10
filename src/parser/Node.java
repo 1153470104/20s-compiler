@@ -24,6 +24,9 @@ public class Node {
         System.out.print(this.nodeSymbol.element());
         if(nodeSymbol.tag == 264)
             System.out.print(" " + ((Word)nodeSymbol).lexeme);
+        else if(nodeSymbol.tag == 270 || nodeSymbol.tag == 272) {
+            System.out.print(" " + ((Num)nodeSymbol).value);
+        }
         System.out.println(" (" + this.nodeSymbol.line + ")");
 
         for(int k = nodeSet.size() - 1; k >= 0; k--) {

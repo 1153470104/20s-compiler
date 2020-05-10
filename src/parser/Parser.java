@@ -1,13 +1,13 @@
 package parser;
 
 import lexer.*;
-import javax.swing.text.Utilities;
 import java.io.IOException;
 import java.util.*;
 
 public class Parser {
+    //syntax structure
     public List<ItemSet> allSet = new LinkedList<>();
-    public Stack<StackUnit> stack = new Stack<>();
+    public LRStack stack = new LRStack();
     public Syntax syntaxStuff = new Syntax("./src/parser/clanguage.txt");
     public int[][] analysisChart;
     public List<String> symbolList = new LinkedList<>();
@@ -15,10 +15,16 @@ public class Parser {
     public Node firstNode;
     public Errors errors;
 
+    //semantic structure
+    public CodeList codeList = new CodeList();
+    public SignList signList = new SignList();
+    public List<Integer> tempList = new LinkedList<>();
+
+
     public void printStack() {
         System.out.print("-------------stack: ");
-        for(int i = 0; i < stack.size(); i++) {
-            System.out.print(stack.get(i).element.nodeSymbol.element() + " ");
+        for (LRStack.StackUnit stackUnit : stack.lrStack) {
+            System.out.print(stackUnit.element.nodeSymbol.element() + " ");
         }
         System.out.println();
     }
@@ -38,41 +44,43 @@ public class Parser {
         int line = 0;
         int tokenIndex = 0;
         int operation = 0;
-        StackUnit first = new StackUnit(0, new Node(new Word("$", '$'), new LinkedList<Node>()));
-        stack.push(first);
+        LRStack.StackUnit first = new LRStack.StackUnit(0, new Node(new Word("$", '$'), new LinkedList<Node>()));
+        stack.lrStack.push(first);
 
         // add very first input token
         Node temp = getTokenToNode(inputList, tokenIndex);
         line = temp.nodeSymbol.line;
         int indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
-        operation = analysisChart[stack.peek().status][indexOfPeek];
+        operation = analysisChart[stack.lrStack.peek().status][indexOfPeek];
 
         //main iteration
         while(true) {
             printStack();
             System.out.println("symbol: " + temp.nodeSymbol);
-            System.out.println("status: " + stack.peek().status);
+            System.out.println("status: " + stack.lrStack.peek().status);
             System.out.println("operation: " + operation);
             System.out.println("tokenIndex: " + tokenIndex);
             System.out.println();
 
             //当出错的时候
             if(operation > 5000) {
-                errors.addError(operation, temp.nodeSymbol.line, stack.peek().status, analysisChart, temp.nodeSymbol.element());
+                errors.addError(operation, temp.nodeSymbol.line, stack.lrStack.peek().status, analysisChart, temp.nodeSymbol.element());
                 tokenIndex += 1;
                 temp = getTokenToNode(inputList, tokenIndex);
+                line = temp.nodeSymbol.line;
                 indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
-                operation = analysisChart[stack.peek().status][indexOfPeek];
+                operation = analysisChart[stack.lrStack.peek().status][indexOfPeek];
             }
             //需要移入的时候
             else if(operation >= 0) {
-                stack.push(new StackUnit(operation, temp));
+                stack.lrStack.push(new LRStack.StackUnit(operation, temp));
 
                 //use analysisChart, get next operation
                 tokenIndex += 1;
                 temp = getTokenToNode(inputList, tokenIndex);
+                line = temp.nodeSymbol.line;
                 indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
-                operation = analysisChart[stack.peek().status][indexOfPeek];
+                operation = analysisChart[stack.lrStack.peek().status][indexOfPeek];
 
             //需要归约的时候
             } else if(operation != -10000) {
@@ -102,14 +110,16 @@ public class Parser {
 //                }
                 int popCount = 0;
                 if(product.get(1).equals("empty")) {
-                    n.nodeSet.add(new Node(new Word("empty", Tag.ID), new LinkedList<Node>()));
+                    Word empty = new Word("empty", 500);
+                    empty.line = line;
+                    n.nodeSet.add(new Node(empty, new LinkedList<Node>()));
                 } else {
                     while (popCount < product.size() - 1) {
                         //上下注释掉的部分，很牛逼。。。因为原本的方案里不会把空的非终结符填入，
                         //所以用栈顶和应当的栈顶比较，不同而且栈顶非终结符可以为空，那就改pop更前面的了
 //                    String s = stack.peek().element.nodeSymbol.element();
-                        n.nodeSet.add(stack.peek().element);
-                        stack.pop();
+                        n.nodeSet.add(stack.lrStack.peek().element);
+                        stack.lrStack.pop();
                         popCount++;
 //                    String p;
 //                    do {
@@ -120,10 +130,11 @@ public class Parser {
                 }
 
                 int indexOfNt = symbolList.indexOf(n.nodeSymbol.element());
-                int prevstatus = stack.peek().status;
+                int prevstatus = stack.lrStack.peek().status;
                 //give a new operation of the non-terminal symbol
                 operation = analysisChart[prevstatus][indexOfNt];
                 temp = n;
+                line = temp.nodeSymbol.line;
                 tokenIndex -= 1;
 
             //分析结束
@@ -131,7 +142,7 @@ public class Parser {
                 Word ww = new Word("Program", Tag.NONTERMINAL);
                 ww.line = line;
                 firstNode = new Node(ww, new LinkedList<>());
-                firstNode.nodeSet.add(stack.peek().element);
+                firstNode.nodeSet.add(stack.lrStack.peek().element);
                 break;
             }
 //            System.out.println("status after: " + stack.peek().status);
@@ -346,14 +357,5 @@ public class Parser {
         }
     }
 
-    static class StackUnit {
-        public int status;
-        public Node element;
-
-        public StackUnit(int status, Node element) {
-            this.status = status;
-            this.element = element;
-        }
-    }
 
 }

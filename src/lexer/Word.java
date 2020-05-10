@@ -86,6 +86,8 @@ public class Word extends Token {
                 return "DIVIDE, " + lexeme;
             case 291:
                 return "GIVE, " + lexeme;
+            case 295:
+                return "PROC, " + lexeme;
         }
 
         return lexeme;
