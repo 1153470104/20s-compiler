@@ -15,15 +15,15 @@ gen = id null F addr
 enter id T offset | offset T width
 value T type C type | value T width C width
 value temp t X type | value temp w X width
-value X type String int | value X width integer 4
-value X type String float | value X width integer 8
+value X type String int | value X width Integer 4
+value X type String float | value X width Integer 8
 
 enter id X offset | offset X offset
 
 
 enter id X offset | offset X offset
 
-value C type array num C 1 type | value C width multi num C 1 width
+value C type array num C 1 type | value C width num val multi C 1 width
 value C type temp t | value C width temp w
 gen = L array E addr
 back B truelist M9 quad | back B falselist M10 quad | merge S nextlist S 1 nextlist N nextlist | merge S nextlist S nextlist S 2 nextlist
@@ -48,7 +48,7 @@ value L array lookup id | gen = L offset L' offset
 value L' type L subtype
 value L' array L 1 array | value temp t newtemp | gen = temp t E addr * L typewidth | value L' offset newtemp | gen = L' offset L' 1 offset + temp t
 value L' type L' 1 subtype
-L'.offset = 0;
+value L' offset integer 0
 
 
 back H 1 falselist M15 quad | merge B truelist H 1 truelist H 2 truelist | value B falselist H 2 falselist
@@ -60,7 +60,7 @@ value M16 quad nextquad
 
 value I truelist B falselist | value I falselist B truelist
 value I truelist B truelist | value I falselist B falselist
-value I truelist makelist nextquad | I falselist makelist nextquadplus | gen ifgoto E 1 addr relop E 2 addr | gen goto null
+value I truelist makelist nextquad | value I falselist makelist nextquadplus | gen ifgoto E 1 addr relop E 2 addr | gen goto null
 value I truelist makelist nextquad | gen goto null
 value I falselist makelist nextquad | gen goto null
 

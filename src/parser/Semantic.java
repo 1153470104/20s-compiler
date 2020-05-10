@@ -14,6 +14,25 @@ public class Semantic {
     public Semantic(String syntaxFile, String semanticFile) throws FileNotFoundException {
         addContent(syntaxFile, semanticFile);
     }
+
+    public int indexCal(List<String> product) {
+        for(int i = 0; i < syntaxList.size(); i++) {
+            if(product.size() == syntaxList.get(i).size()) {
+                boolean wrong = false;
+                for(int j = 0; j < syntaxList.get(i).size(); j ++) {
+                    if(!product.get(j).equals(syntaxList.get(i).get(j))) {
+                        wrong = true;
+                        break;
+                    }
+                }
+                if(!wrong) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     public void addContent(String syntaxFile, String semanticFile) throws FileNotFoundException {
         FileReader fr = new FileReader(syntaxFile);
         BufferedReader br = new BufferedReader(fr);
@@ -38,8 +57,14 @@ public class Semantic {
                 line2 = stringLine.split(" ");
                 List<List<String>> allcodes = new LinkedList<>();
                 List<String> code = new LinkedList<>();
+                //最开始把两种情况加到一起了，导致最后一个语句的最后一个字符无法加入，
+                // 要拆成两个情况才行
                 for(int i = 0; i < line2.length; i++) {
-                    if(line2[i].equals("|") || i == line2.length - 1) {
+                    if(line2[i].equals("|")) {
+                        allcodes.add(code);
+                        code = new LinkedList<>();
+                    } else if (i == line2.length - 1){
+                        code.add(line2[i]);
                         allcodes.add(code);
                         code = new LinkedList<>();
                     } else {

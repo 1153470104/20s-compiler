@@ -71,6 +71,7 @@ public class ParserClient {
         }
 
         Parser p = new Parser();
+        p.stack.semantic.printSemantic();
         System.out.println(p.syntaxStuff.firstSet);
         Item i = new Item(List.of("Program", "P"), 1, "$");
         ItemSet set = new ItemSet();
@@ -79,18 +80,19 @@ public class ParserClient {
 //        System.out.println("1/////////////////////");
 
         p.parse(set);
-        for(int j = 0; j < p.allSet.size(); j++) {
-            System.out.println();
-            p.allSet.get(j).printSet();
-        }
+//        for(int j = 0; j < p.allSet.size(); j++) {
+//            System.out.println();
+//            p.allSet.get(j).printSet();
+//        }
 
 //        System.out.println("2/////////////////////");
         p.createChart();
-        p.printDiagram();
+//        p.printDiagram();
 
         p.analyse(l1.tokens);
         p.firstNode.printNode(0);
         p.errors.errorPrint();
+        p.stack.signList.printSignList();
     }
 
     public static void printSemantic() throws FileNotFoundException {
@@ -108,6 +110,7 @@ public class ParserClient {
 //        testAnalyse("./src/lexer/test/5.txt");
 //        testAnalyse("./src/lexer/test/6.txt");
 //        testAnalyse("./src/lexer/test/2.txt");
-        printSemantic();
+//        printSemantic();
+        testAnalyse("./src/parser/test/define.txt");
     }
 }

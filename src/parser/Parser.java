@@ -15,19 +15,6 @@ public class Parser {
     public Node firstNode;
     public Errors errors;
 
-    //semantic structure
-    public CodeList codeList = new CodeList();
-    public SignList signList = new SignList();
-    public List<Integer> tempList = new LinkedList<>();
-
-
-    public void printStack() {
-        System.out.print("-------------stack: ");
-        for (LRStack.StackUnit stackUnit : stack.lrStack) {
-            System.out.print(stackUnit.element.nodeSymbol.element() + " ");
-        }
-        System.out.println();
-    }
 
     public Node getTokenToNode(List<Token> inputList, int tokenIndex) {
         Node peek;
@@ -53,13 +40,20 @@ public class Parser {
         int indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
         operation = analysisChart[stack.lrStack.peek().status][indexOfPeek];
 
+        //semantic structure
+        int semanticOrder = 0;
+        boolean semanticOrNot = false;
+        Map<String, String> fieldMap = new HashMap<>();
+
         //main iteration
         while(true) {
-            printStack();
+            stack.printStack();
             System.out.println("symbol: " + temp.nodeSymbol);
             System.out.println("status: " + stack.lrStack.peek().status);
             System.out.println("operation: " + operation);
             System.out.println("tokenIndex: " + tokenIndex);
+            System.out.println("semantic or not: " + semanticOrNot);
+            System.out.println("semantic order: " + semanticOrder);
             System.out.println();
 
             //当出错的时候
@@ -73,7 +67,12 @@ public class Parser {
             }
             //需要移入的时候
             else if(operation >= 0) {
-                stack.lrStack.push(new LRStack.StackUnit(operation, temp));
+                if(semanticOrNot) {
+                    stack.lrStack.push(new LRStack.StackUnit(operation, temp, fieldMap));
+                } else {
+                    stack.lrStack.push(new LRStack.StackUnit(operation, temp));
+                }
+                semanticOrNot = false;
 
                 //use analysisChart, get next operation
                 tokenIndex += 1;
@@ -108,6 +107,11 @@ public class Parser {
 //                    n.nodeSet.add(stack.peek().element);
 //                    stack.pop();
 //                }
+                //semantic operation
+                semanticOrNot = true;
+                semanticOrder = stack.semantic.indexCal(product);
+                fieldMap = stack.doSemantic(semanticOrder);
+
                 int popCount = 0;
                 if(product.get(1).equals("empty")) {
                     Word empty = new Word("empty", 500);
@@ -136,6 +140,7 @@ public class Parser {
                 temp = n;
                 line = temp.nodeSymbol.line;
                 tokenIndex -= 1;
+
 
             //分析结束
             } else {
