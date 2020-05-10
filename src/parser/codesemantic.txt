@@ -1,77 +1,76 @@
 
 
-                                                     offset = 0
 
 
 
-enter id T offset | offset T width                   enter(id.lexeme,T.type,offset); offset = offset+T.width;
 
-enter id proc offset                                 type='proc'; enterproc(id.lexeme, type, offset);
+enter id T offset | offset T width
 
-enter id record offset                               type='record'; enterrecord(id.lexeme, type, offset);
-gen = id null F addr                                 gen(id '=' F.addr);
+enter id proc offset
 
-
-enter id T offset | offset T width                   enter(id.lexeme, type, offset); offset=offset+X.offset;
-value T type C type | value T width C width          T.type=C.type; T.width=C.width;
-value temp t X type | value temp w X width           t=X.type; w=X.width;
-value X type String int | value X width integer 4    X.type=int; X.width=4;
-value X type String float | value X width integer 8  X.type=float; X.width=8;
-
-enter id X offset | offset X offset                  enter(id.lexeme, type, offset); offset=offset+X.offset;
+enter id record offset
+gen = id null F addr
 
 
-enter id X offset | offset X offset                  enter(id.lexeme, type, offset);
+enter id T offset | offset T width
+value T type C type | value T width C width
+value temp t X type | value temp w X width
+value X type String int | value X width integer 4
+value X type String float | value X width integer 8
 
-value C type array num C 1 type | value C width multi num C 1 width                C.type=array(num.val, C1.type); C.width=num.val*C1.width;
-value C type temp t | value C width temp w           C.type=t; C.width=w;
-gen = L array E addr                                 gen(L.array '[ L.offset ']' '=' E.addr);
-back B truelist M9 quad | back B falselist M10 quad | merge S nextlist S 1 nextlist N nextlist | merge S nextlist S nextlist S 2 nextlist                   backpatch(B.truelist, M9.quad); backpatch(B.falselist, M10.quad); S.nextlist=merge(merge(S1.nextlist, N.nextlist), S2.nextlist);
-value N nextlist makelist nextquad | gen goto null   N.nextlist=makelist(nextquad); gen('goto_');
-value M9 quad nextquad                               M9.quad = nextquad
-value M10 quad nextquad                              M10.quad=nextquad
-value S nextlist B falselist | back S 1 nextlist M11 quad | back B truelist M12 quad | gen goto M11 quad                    S.nextlist=B.falselist; backpatch(S1.nextlist, M11.quad); backpatch(B.truelist, M12.quad); gen('goto'M11.quad);
-value M11 quad nextquad                              M11.quad = nextquad
-value M12 quad nextquad                              M12.quad=nextquad
-value E addr newtemp | gen = E addr E' addr + G addr           E.addr = newtemp(); gen( E.addr'=' E'.addr '+' G.addr);
-value E' addr G addr                                           E'.addr=G.addr;
+enter id X offset | offset X offset
 
-value G addr newtemp | gen = G addr G' addr * F addr           G.addr = newtemp(); gen( G.addr'=' G'.addr '*' F.addr);
-value G' addr F addr                                           G'.addr=F.addr;
 
-value F addr E addr                                  F.addr=E.addr;
-value F addr lookup id                               F.addr=lookup(id.lexeme); if F.addr = nil then error;
-value F val num val                                  F.val=num.lex
-value F val digit val                                F.val=digit.lex;
-value E addr newtemp | gen = E addr L array          E.addr = newtemp(); gen( E.addr '=' L.array '[' L.offset ']' );
-value L array lookup id | gen = L offset L' offset   L.array=lookup(id.lexeme); if L.array = nil then error; L.offset=newtemp(); gen( L.offset'=' L'.offset );
-value L' type L subtype                              L'.type = L.array.type.elem ;
-value L' array L 1 array | value temp t newtemp | gen = temp t E addr * L typewidth | value L' offset newtemp | gen = L' offset L' 1 offset + temp t                      L'.array = L'1. array; t = newtemp(); gen( t ‘=’ E.addr '*' L'.type.width ); L'.offset = newtemp(); gen( L'.offset '=' L'1.offset '+' t );
-value L' type L' 1 subtype                           L'.type = L'1.type.elem ;
+enter id X offset | offset X offset
+
+value C type array num C 1 type | value C width multi num C 1 width
+value C type temp t | value C width temp w
+gen = L array E addr
+back B truelist M9 quad | back B falselist M10 quad | merge S nextlist S 1 nextlist N nextlist | merge S nextlist S nextlist S 2 nextlist
+value N nextlist makelist nextquad | gen goto null
+value M9 quad nextquad
+value M10 quad nextquad
+value S nextlist B falselist | back S 1 nextlist M11 quad | back B truelist M12 quad | gen goto M11 quad
+value M11 quad nextquad
+value M12 quad nextquad
+value E addr newtemp | gen = E addr E' addr + G addr
+value E' addr G addr
+
+value G addr newtemp | gen = G addr G' addr * F addr
+value G' addr F addr
+
+value F addr E addr
+value F addr lookup id
+value F val num val
+value F val digit val
+value E addr newtemp | gen = E addr L array
+value L array lookup id | gen = L offset L' offset
+value L' type L subtype
+value L' array L 1 array | value temp t newtemp | gen = temp t E addr * L typewidth | value L' offset newtemp | gen = L' offset L' 1 offset + temp t
+value L' type L' 1 subtype
 L'.offset = 0;
 
 
-back H 1 falselist M15 quad | merge B truelist H 1 truelist H 2 truelist | value B falselist H 2 falselist                       backpatch(H1.falselist, M15.quad); B.truelist=merge(H1.truelist, H2.truelist); B.falselist=H2.falselist;
-value M15 quad nextquad                              M15.quad=nextquad;
+back H 1 falselist M15 quad | merge B truelist H 1 truelist H 2 truelist | value B falselist H 2 falselist
+value M15 quad nextquad
 
 
-back I 1 truelist M16 quad | merge H falselist I 1 falselist I 2 falselist | value H truelist I 2 truelist                       backpatch(I1.truelist, M16.quad); H.falselist=merge(I1.falselist, I2.falselist); H.truelist=I2.truelist;
-value M16 quad nextquad                              M16.quad=nextquad;
+back I 1 truelist M16 quad | merge H falselist I 1 falselist I 2 falselist | value H truelist I 2 truelist
+value M16 quad nextquad
 
-value I truelist B falselist | value I falselist B truelist                  I.truelist=B.falselist; I.falselist=B.truelist;
-value I truelist B truelist | value I falselist B falselist                  I.truelist=B.truelistl I.falselist=B.falselist;
-value I truelist makelist nextquad | I falselist makelist nextquadplus | gen ifgoto E 1 addr relop E 2 addr | gen goto null      I.truelist=makelist(nextquad); I.falselist=makelist(nextquad + 1); gen('if' E1.addr relop E2.addr 'goto'); gen('goto_');
-value I truelist makelist nextquad | gen goto null                           I.truelist=makelist(nextquad); gen('goto_');
-value I falselist makelist nextquad | gen goto null                          I.falselist=makelist(nextquad); gen('goto_');
-
-
-
+value I truelist B falselist | value I falselist B truelist
+value I truelist B truelist | value I falselist B falselist
+value I truelist makelist nextquad | I falselist makelist nextquadplus | gen ifgoto E 1 addr relop E 2 addr | gen goto null
+value I truelist makelist nextquad | gen goto null
+value I falselist makelist nextquad | gen goto null
 
 
 
 
-type='proc'; enterproc(id.lexeme, type, offset);
-n = 0; for(q 中每个t do {gen('param' t); n=n+1;}); gen('call' id.addr ',' n);
-gen('return' E.addr);
-将q初始化为只包含E.addr;
-将E.addr添加到q队尾;
+
+
+value temp n interger 0 | param queue | call id n
+gen return E addr
+addq E addr
+addq E addr
+initq

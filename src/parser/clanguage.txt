@@ -69,8 +69,6 @@ relop ==
 relop !=
 relop >
 relop >=
-D proc X id M17 ( M ) { P }
-M17 empty
 S call id ( Elist ) ;
 S return E ;
 Elist E Elist'

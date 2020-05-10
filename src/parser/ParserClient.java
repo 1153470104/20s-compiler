@@ -1,6 +1,8 @@
 package parser;
 
 import lexer.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
@@ -91,15 +93,21 @@ public class ParserClient {
         p.errors.errorPrint();
     }
 
+    public static void printSemantic() throws FileNotFoundException {
+        LRStack s = new LRStack();
+        s.semantic.printSemantic();
+    }
+
     public static void main(String[] args) throws IOException {
 //        testClosure();
 //        testSyntax();
 //        testParse();
 //        testChart();
-        testAnalyse("./src/lexer/test/2.txt");
+//        testAnalyse("./src/lexer/test/2.txt");
 //        testAnalyse("./src/lexer/test/4.txt");
 //        testAnalyse("./src/lexer/test/5.txt");
 //        testAnalyse("./src/lexer/test/6.txt");
 //        testAnalyse("./src/lexer/test/2.txt");
+        printSemantic();
     }
 }
