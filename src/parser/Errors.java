@@ -22,6 +22,7 @@ public class Errors {
 
     List<ErrorInfo> errors = new LinkedList<>();
 
+    public Errors(){};
     public Errors(List<String> symbolList) {
         this.symbolList = symbolList;
     }

@@ -1,3 +1,4 @@
+/*int[9] x;*/
 float b;
 int a = 0;
 int c, d;

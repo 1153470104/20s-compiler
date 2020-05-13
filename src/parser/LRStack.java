@@ -13,6 +13,7 @@ public class LRStack {
     //semantic structure
     public CodeList codeList = new CodeList();
     public SignList signList = new SignList();
+    public Errors semanticErrors;
     public List<Integer> tempList = new LinkedList<>();
     String w, t;
     int offset = 0;
@@ -47,9 +48,21 @@ public class LRStack {
     }
 
     public int indexOfStack(String s) {
-        for(int i = 0; i < lrStack.size(); i++) {
+        for(int i = lrStack.size()-1; i >= 0; i--) {
             if((lrStack.get(i).element.nodeSymbol).element().equals(s)){
                 return i;
+            }
+        }
+        return -1;
+    }
+    public int indexOfStack(String s, int count) {
+        int a = 0;
+        for(int i = 0; i < lrStack.size(); i++) {
+            if((lrStack.get(i).element.nodeSymbol).element().equals(s)){
+                a++;
+                if(a == count) {
+                    return i;
+                }
             }
         }
         return -1;
@@ -80,9 +93,26 @@ public class LRStack {
     public void value(List<String> code, Map<String, String> fieldMap, int order) {
         if(code.size() == 5) {
             if(code.get(3).equals("lookup")){
+                //这里可能会有先后顺序的问题！！到底是哪个id
+                String id = ((Word)lrStack.get(indexOfStack("id")).element.nodeSymbol).lexeme;
+                if(!signList.lookup(id)) {
+                    semanticErrors.errors.add(
+                            new Errors.ErrorInfo(lrStack.peek().element.nodeSymbol.line
+                            , "Variable usage with out been declared"));
+                    return;
+                }
+                int firstIndex = -1;
+                boolean firstself = code.get(1).equals(semantic.syntaxList.get(order).get(0));
+                if(firstself) {
+                    fieldMap.put(code.get(2), id);
+                } else {
+                    firstIndex = indexOfStack(code.get(1));
+                    lrStack.get(firstIndex).fieldMap.put(code.get(2), id);
+                }
 
             } else if(code.get(3).equals("num") || code.get(3).equals("digit")) {
-                fieldMap.put("addr", ((Num)lrStack.get(indexOfStack(code.get(3))).element.nodeSymbol).value + "");
+                fieldMap.put("addr", ((Num)lrStack.get(
+                        indexOfStack(code.get(3))).element.nodeSymbol).value + "");
                 System.out.println("---------------------- the things: " + fieldMap.get("addr"));
             } else if (code.get(3).equals("Integer") || code.get(3).equals("String")) {
                 int firstIndex = -1;
@@ -97,13 +127,11 @@ public class LRStack {
                 int firstIndex = -1;
                 boolean firstself = code.get(1).equals(semantic.syntaxList.get(order).get(0));
                 if(firstself) {
-                    System.out.println("this!!!!!!!!!!!!!!!");
                     if(code.get(4).equals("t"))
                         fieldMap.put(code.get(2), t);
                     if(code.get(4).equals("w"))
                         fieldMap.put(code.get(2), w);
                 } else {
-                    System.out.println("that!!!!!!!!!!!!!!!");
                     firstIndex = indexOfStack(code.get(1));
                     if(code.get(4).equals("t"))
                         lrStack.get(firstIndex).fieldMap.put(code.get(2), t);
@@ -116,13 +144,11 @@ public class LRStack {
                 boolean secondelf = code.get(3).equals(semantic.syntaxList.get(order).get(0));
                 System.out.println("the code: " + Arrays.toString(code.toArray()));
                 if (secondelf) {
-                    System.out.println("so!!!!!!!!!!!!!!!");
                     if(code.get(2).equals("t"))
                         t = fieldMap.get(code.get(4));
                     if(code.get(2).equals("w"))
                         w = fieldMap.get(code.get(4));
                 } else {
-                    System.out.println("ugly!!!!!!!!!!!!!!!");
                     secondIndex = indexOfStack(code.get(3));
                     if(code.get(2).equals("t"))
                         t = lrStack.get(secondIndex).fieldMap.get(code.get(4));
@@ -132,6 +158,30 @@ public class LRStack {
             } else {
                 valuePut(code, fieldMap, order);
             }
+        } else if(code.size() == 8) {
+            //still with only situation
+            int c1 = indexOfStack("C");
+            int num = indexOfStack("num");
+            int numValue = ((Num)lrStack.get(num).element.nodeSymbol).value;
+            fieldMap.put("array", numValue + "");
+            fieldMap.put("type", getFromStack("type", c1));
+            if(lrStack.get(c1).fieldMap.containsKey("array")) {
+                int i = 1;
+                while(lrStack.get(c1).fieldMap.containsKey("array" + i)) {
+                    fieldMap.put("array"+i, lrStack.get(c1).fieldMap.get("array" + i));
+                    i++;
+                }
+                fieldMap.put("array"+1, getFromStack("array", c1));
+            }
+
+        } else if(code.size() == 9) {
+            //this is the only situation when array is declared
+            int c1 = indexOfStack("C");
+            int num = indexOfStack("num");
+            int c1value = Integer.parseInt(getFromStack("width", c1));
+            int numValue = ((Num)lrStack.get(num).element.nodeSymbol).value;
+            int putValue = c1value * numValue;
+            fieldMap.put("width", putValue + "");
         }
     }
 
@@ -157,7 +207,8 @@ public class LRStack {
                 codeList.add(first + " = " + second);
                 codeList.add("=", second, null, first);
             } else if (code.get(2).equals("id")) {
-                String first = ((Word)lrStack.get(indexOfStack("id")).element.nodeSymbol).lexeme;
+                String first = ((Word)lrStack.get(
+                        indexOfStack("id")).element.nodeSymbol).lexeme;
                 String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
                 codeList.add(first + " = " + second);
                 codeList.add("=", second, null, first);
@@ -192,6 +243,13 @@ public class LRStack {
 
     }
 
+    public void enter(List<String> code, Map<String, String> fieldMap, int order){
+        int index = indexOfStack(code.get(2));
+        int idIndex = indexOfStack("id");
+        signList.enter(((Word)lrStack.get(idIndex).element.nodeSymbol).lexeme
+                , lrStack.get(index), offset);
+    }
+
     public Map<String, String> doSemantic(int order) {
         List<List<String>> semanticCode = semantic.semanticList.get(order);
         Map<String, String> fieldMap = new HashMap<>();
@@ -207,11 +265,12 @@ public class LRStack {
             switch (code.get(0)) {
                 case "enter":
 //                    System.out.println("here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    signList.enter(code.get(1), code.get(2), offset);
+                    enter(code, fieldMap, order);
                     break;
                 case "offset":
                     int firstIndex = indexOfStack(code.get(1));
-                    int width = Integer.parseInt(lrStack.get(firstIndex).fieldMap.get(code.get(2)));
+                    int width = Integer.parseInt(lrStack.get(
+                            firstIndex).fieldMap.get(code.get(2)));
                     offset = offset + width;
                     break;
                 case "value":

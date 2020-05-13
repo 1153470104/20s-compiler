@@ -1,4 +1,3 @@
-float b;
+int b;
 int a = 0;
-int c, d;
-c = d;
+b = a;
