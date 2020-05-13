@@ -93,6 +93,7 @@ public class ParserClient {
         p.firstNode.printNode(0);
         p.errors.errorPrint();
         p.stack.signList.printSignList();
+        p.stack.codeList.printCode();
     }
 
     public static void printSemantic() throws FileNotFoundException {

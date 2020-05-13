@@ -1,5 +1,6 @@
 package parser;
 
+import lexer.Num;
 import lexer.Word;
 
 import java.io.FileNotFoundException;
@@ -72,12 +73,17 @@ public class LRStack {
         }
     }
 
+    public boolean isSelfStack(List<String> code, int order, int index) {
+        return code.get(index).equals(semantic.syntaxList.get(order).get(0));
+    }
+
     public void value(List<String> code, Map<String, String> fieldMap, int order) {
         if(code.size() == 5) {
             if(code.get(3).equals("lookup")){
 
-            } else if(code.get(3).equals("num") && code.get(3).equals("digit")) {
-
+            } else if(code.get(3).equals("num") || code.get(3).equals("digit")) {
+                fieldMap.put("addr", ((Num)lrStack.get(indexOfStack(code.get(3))).element.nodeSymbol).value + "");
+                System.out.println("---------------------- the things: " + fieldMap.get("addr"));
             } else if (code.get(3).equals("Integer") || code.get(3).equals("String")) {
                 int firstIndex = -1;
                 boolean firstself = code.get(1).equals(semantic.syntaxList.get(order).get(0));
@@ -129,6 +135,63 @@ public class LRStack {
         }
     }
 
+    public String getFromStack(String type, int stackIndex) {
+        String content = lrStack.get(stackIndex).fieldMap.get(type);
+        if(null != content) {
+            return content;
+        } else {
+            return null;
+        }
+    }
+
+    public void genEqual(List<String> code, Map<String, String> fieldMap, int order) {
+        if(code.size() == 6) {
+            if(isSelfStack(code, order, 2)) {
+                String first = fieldMap.get(code.get(3));
+                String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
+                codeList.add(first + " = " + second);
+                codeList.add("=", second, null, first);
+            }else if (isSelfStack(code, order, 4)) {
+                String second = fieldMap.get(code.get(5));
+                String first = getFromStack(code.get(3), indexOfStack(code.get(2)));
+                codeList.add(first + " = " + second);
+                codeList.add("=", second, null, first);
+            } else if (code.get(2).equals("id")) {
+                String first = ((Word)lrStack.get(indexOfStack("id")).element.nodeSymbol).lexeme;
+                String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
+                codeList.add(first + " = " + second);
+                codeList.add("=", second, null, first);
+            } else {
+                String first = getFromStack(code.get(3), indexOfStack(code.get(2)));
+                String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
+                codeList.add(first + " = " + second);
+                codeList.add("=", second, null, first);
+            }
+        }
+    }
+
+    public void genGoto(List<String> code, Map<String, String> fieldMap, int order) {
+    }
+    public void genIfGoto(List<String> code, Map<String, String> fieldMap, int order) {
+
+    }
+
+
+    public void generate(List<String> code, Map<String, String> fieldMap, int order) {
+        switch (code.get(1)) {
+            case "=":
+                genEqual(code, fieldMap, order);
+                break;
+            case "goto":
+                genGoto(code, fieldMap, order);
+                break;
+            case "ifgoto":
+                genIfGoto(code, fieldMap, order);
+                break;
+        }
+
+    }
+
     public Map<String, String> doSemantic(int order) {
         List<List<String>> semanticCode = semantic.semanticList.get(order);
         Map<String, String> fieldMap = new HashMap<>();
@@ -159,12 +222,10 @@ public class LRStack {
                 case "back":
                     break;
                 case "gen":
+                    generate(code, fieldMap, order);
                     break;
             }
         }
-
-
-
         return fieldMap;
     }
 }
