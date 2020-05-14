@@ -1,4 +1,4 @@
-/*int[9] x;*/
+float[4][2][8][100] x;
 float b;
 int a = 0;
 int c, d;

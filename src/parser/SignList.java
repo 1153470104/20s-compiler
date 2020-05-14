@@ -44,6 +44,23 @@ public class SignList {
 
         @Override
         public String toString() {
+//            System.out.println(type.fieldMap);
+            if(type.fieldMap.containsKey("array")) {
+                String typeString = type.fieldMap.get("type");
+                int i = 1;
+                while(type.fieldMap.containsKey("array" + i)) {
+                    String num = type.fieldMap.get("array" + i);
+                    typeString = "array(" + num + ", " + typeString + ")";
+                    i++;
+                }
+                String numOut = type.fieldMap.get("array");
+                typeString = "array(" + numOut + ", " + typeString + ")";
+                return "SymbolEntry{" +
+                        "type='" + typeString + '\'' +
+                        ", lexeme='" + lexeme + '\'' +
+                        ", offset=" + offset +
+                        '}';
+            }
             return "SymbolEntry{" +
                     "type='" + type.fieldMap.get("type") + '\'' +
                     ", lexeme='" + lexeme + '\'' +

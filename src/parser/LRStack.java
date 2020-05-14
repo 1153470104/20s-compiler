@@ -75,6 +75,16 @@ public class LRStack {
         if(firstself) {
             secondIndex = indexOfStack(code.get(3));
             fieldMap.put(code.get(2), lrStack.get(secondIndex).fieldMap.get(code.get(4)));
+            if(code.get(4).equals("type")) {
+                if(lrStack.get(secondIndex).fieldMap.containsKey("array")) {
+                    fieldMap.put("array", getFromStack("array", secondIndex));
+                    int i = 1;
+                    while(lrStack.get(secondIndex).fieldMap.containsKey("array" + i)) {
+                        fieldMap.put("array" + i, getFromStack("array"+i, secondIndex));
+                        i++;
+                    }
+                }
+            }
         } else if (secondelf) {
             firstIndex = indexOfStack(code.get(1));
             lrStack.get(firstIndex).fieldMap.put(code.get(2), fieldMap.get(code.get(4)));
@@ -171,7 +181,7 @@ public class LRStack {
                     fieldMap.put("array"+i, lrStack.get(c1).fieldMap.get("array" + i));
                     i++;
                 }
-                fieldMap.put("array"+1, getFromStack("array", c1));
+                fieldMap.put("array"+i, getFromStack("array", c1));
             }
 
         } else if(code.size() == 9) {
@@ -243,7 +253,7 @@ public class LRStack {
 
     }
 
-    public void enter(List<String> code, Map<String, String> fieldMap, int order){
+    public void enter(List<String> code){
         int index = indexOfStack(code.get(2));
         int idIndex = indexOfStack("id");
         signList.enter(((Word)lrStack.get(idIndex).element.nodeSymbol).lexeme
@@ -265,7 +275,7 @@ public class LRStack {
             switch (code.get(0)) {
                 case "enter":
 //                    System.out.println("here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    enter(code, fieldMap, order);
+                    enter(code);
                     break;
                 case "offset":
                     int firstIndex = indexOfStack(code.get(1));
