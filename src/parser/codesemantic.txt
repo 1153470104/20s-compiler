@@ -45,7 +45,7 @@ value F val num val
 value F val digit val
 value E addr newtemp | gen = E addr L addr
 value L array lookup id | gen = L offset L' offset
-value M13 array lookup id | value M13 type M13 subtype
+value M13 array lookup id
 value temp t newtemp | gen = temp t E addr * L' typewidth | value L' offset newtemp | gen = L' offset L' 1 offset + temp t
 value M14 type L' subtype
 value L' offset Integer 0

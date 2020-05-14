@@ -102,13 +102,13 @@ public class LRStack {
 
     public void value(List<String> code, Map<String, String> fieldMap, int order) {
         if(code.size() == 4) {
-            if(code.get(3).equals("newtemp")) {
+            if(code.get(1).equals("temp")) {
+                tempList.add("doesn't matter");
+                fieldMap.put("temp", (tempList.size() - 1) + "");
+            } else if(code.get(3).equals("newtemp")) {
                 fieldMap.put(code.get(2), "temp");
                 tempList.add("doesn't matter");
                 fieldMap.put(code.get(2) + "temp", (tempList.size() - 1) + "");
-            } else if(code.get(1).equals("temp")) {
-                tempList.add("doesn't matter");
-                fieldMap.put("temp", (tempList.size() - 1) + "");
             }
         } else if(code.size() == 5) {
             if(code.get(3).equals("lookup")){
@@ -328,6 +328,8 @@ public class LRStack {
             if(code.get(6).equals("*") && code.get(8).equals("typewidth")) {
                 int indexE = indexOfStack("E");
                 String StringE = lrStack.get(indexE).fieldMap.get("addr");
+                if(StringE.equals("temp"))
+                    StringE = "t" + lrStack.get(indexE).fieldMap.get("addrtemp");
                 String typeWidth = typewidth(indexOfStack("M14"));
                 String t = fieldMap.get("temp");
                 codeList.add("t"+t + " = " + StringE + " * " + typeWidth);
@@ -337,10 +339,11 @@ public class LRStack {
             if(code.get(3).equals("offset") && code.get(6).equals("offset")) {
                 String offsetL = "t" + fieldMap.get("offsettemp");
                 String tempt = "t" + fieldMap.get("temp");
-                int indexSub = indexOfStack("M14");
-                if(!lrStack.get(indexSub).fieldMap.containsKey("array")) {
+                int indexSub = indexOfStack("L'");
+                int indexM = indexOfStack("M14");
+                if(!lrStack.get(indexM).fieldMap.containsKey("array")) {
                     codeList.add(offsetL + " = " + getFromStack(
-                            "offset", indexSub) +  tempt);
+                            "offset", indexSub) + " + " + tempt);
                     codeList.add("=", tempt, getFromStack("offset", indexSub), offsetL);
                     return;
                 }
