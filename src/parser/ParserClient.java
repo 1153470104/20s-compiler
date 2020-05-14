@@ -112,7 +112,7 @@ public class ParserClient {
 //        testAnalyse("./src/lexer/test/6.txt");
 //        testAnalyse("./src/lexer/test/2.txt");
 //        printSemantic();
-        testAnalyse("./src/parser/test/define.txt");
-//        testAnalyse("./src/parser/test/assignment.txt");
+//        testAnalyse("./src/parser/test/define.txt");
+        testAnalyse("./src/parser/test/assignment.txt");
     }
 }

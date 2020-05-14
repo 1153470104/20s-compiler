@@ -18,14 +18,16 @@ public class SignList {
         }
     }
 
-    public boolean lookup(String s){
-        for(SymbolEntry entry: symbolEntryList) {
-            if(s.equals(entry.lexeme)) {
-                return true;
+    public int lookup(String s){
+        for(int i = 0; i < symbolEntryList.size(); i++) {
+            if(s.equals(symbolEntryList.get(i).lexeme)) {
+                return i;
             }
         }
-        return false;
+        return -1;
     }
+
+
 
     public void enter(String type, LRStack.StackUnit lexeme, int offset) {
         this.symbolEntryList.add(new SymbolEntry(type, lexeme, offset));

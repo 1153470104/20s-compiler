@@ -48,7 +48,7 @@ value L array lookup id | gen = L offset L' offset
 value M13 array lookup id | value M13 type M13 subtype
 value temp t newtemp | gen = temp t E addr * L' typewidth | value L' offset newtemp | gen = L' offset L' 1 offset + temp t
 value M14 type L' subtype
-value L' offset Integer 0
+value L' offset integer 0
 
 
 back H 1 falselist M15 quad | merge B truelist H 1 truelist H 2 truelist | value B falselist H 2 falselist

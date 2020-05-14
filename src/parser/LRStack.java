@@ -14,7 +14,7 @@ public class LRStack {
     public CodeList codeList = new CodeList();
     public SignList signList = new SignList();
     public Errors semanticErrors;
-    public List<Integer> tempList = new LinkedList<>();
+    public List<String> tempList = new LinkedList<>();
     String w, t;
     int offset = 0;
 
@@ -101,24 +101,37 @@ public class LRStack {
     }
 
     public void value(List<String> code, Map<String, String> fieldMap, int order) {
-        if(code.size() == 5) {
+        if(code.size() == 4) {
+            if(code.get(3).equals("newtemp")) {
+                fieldMap.put(code.get(2), "temp");
+                tempList.add("doesn't matter");
+                fieldMap.put(code.get(2) + "temp", (tempList.size() - 1) + "");
+            } else if(code.get(1).equals("temp")) {
+                tempList.add("doesn't matter");
+                fieldMap.put("temp", (tempList.size() - 1) + "");
+            }
+        } else if(code.size() == 5) {
             if(code.get(3).equals("lookup")){
                 //这里可能会有先后顺序的问题！！到底是哪个id
                 String id = ((Word)lrStack.get(indexOfStack("id")).element.nodeSymbol).lexeme;
-                if(!signList.lookup(id)) {
+                int indexId = signList.lookup(id);
+                if(indexId == -1) {
                     semanticErrors.errors.add(
                             new Errors.ErrorInfo(lrStack.peek().element.nodeSymbol.line
                             , "Variable usage with out been declared"));
                     return;
                 }
-                int firstIndex = -1;
-                boolean firstself = code.get(1).equals(semantic.syntaxList.get(order).get(0));
-                if(firstself) {
-                    fieldMap.put(code.get(2), id);
-                } else {
-                    firstIndex = indexOfStack(code.get(1));
-                    lrStack.get(firstIndex).fieldMap.put(code.get(2), id);
+                StackUnit stack = signList.symbolEntryList.get(indexId).type;
+                if(stack.fieldMap.containsKey("array")) {
+                    fieldMap.put("array", stack.fieldMap.get("array"));
+                    int i = 1;
+                    while(stack.fieldMap.containsKey("array"+i)) {
+                        fieldMap.put("array"+i, stack.fieldMap.get("array"+i));
+                        i++;
+                    }
                 }
+                fieldMap.put("type", stack.fieldMap.get("type"));
+                fieldMap.put("addr", id);
 
             } else if(code.get(3).equals("num") || code.get(3).equals("digit")) {
                 fieldMap.put("addr", ((Num)lrStack.get(
@@ -154,16 +167,42 @@ public class LRStack {
                 boolean secondelf = code.get(3).equals(semantic.syntaxList.get(order).get(0));
                 System.out.println("the code: " + Arrays.toString(code.toArray()));
                 if (secondelf) {
-                    if(code.get(2).equals("t"))
+                    if (code.get(2).equals("t"))
                         t = fieldMap.get(code.get(4));
-                    if(code.get(2).equals("w"))
+                    if (code.get(2).equals("w"))
                         w = fieldMap.get(code.get(4));
                 } else {
                     secondIndex = indexOfStack(code.get(3));
-                    if(code.get(2).equals("t"))
+                    if (code.get(2).equals("t"))
                         t = lrStack.get(secondIndex).fieldMap.get(code.get(4));
-                    if(code.get(2).equals("w"))
+                    if (code.get(2).equals("w"))
                         w = lrStack.get(secondIndex).fieldMap.get(code.get(4));
+                }
+            } else if(code.get(4).equals("subtype")) {
+                if(code.get(1).equals("M13")) {
+                    int i = 1;
+                    while(fieldMap.containsKey("array"+i)) {
+                        i++;
+                    }
+                    i = i - 1;
+                    String array = fieldMap.get("array"+i);
+                    fieldMap.remove("array"+i);
+                    if(i != 0)
+                        fieldMap.put("array", array);
+                } else if(code.get(1).equals("M14")) {
+                    int indexL = indexOfStack("[") - 1;
+                    Map<String, String> map = lrStack.get(indexL).fieldMap;
+                    fieldMap.put("type", map.get("type"));
+                    int i = 1;
+                    while(map.containsKey("array"+i)) {
+                        fieldMap.put("array"+i, map.get("array"+i));
+                        i++;
+                    }
+                    i = i - 1;
+                    String array = fieldMap.get("array"+i);
+                    fieldMap.remove("array"+i);
+                    if(array!=null)
+                        fieldMap.put("array", array);
                 }
             } else {
                 valuePut(code, fieldMap, order);
@@ -204,16 +243,64 @@ public class LRStack {
         }
     }
 
+    public String typewidth(int index) {
+        Map<String, String> map = lrStack.get(index).fieldMap;
+        String type = map.get("type");
+        int width = 1;
+        if(type.equals("int"))
+            width =  4;
+        else if(type.equals("float"))
+            width = 8;
+
+        if(map.containsKey("array")) {
+            width = width * Integer.parseInt(map.get("array"));
+            int i = 1;
+            while(map.containsKey("array" + i)) {
+                width = width * Integer.parseInt(map.get("array" + i));
+                i++;
+            }
+        }
+        return width + "";
+    }
+
     public void genEqual(List<String> code, Map<String, String> fieldMap, int order) {
         if(code.size() == 6) {
-            if(isSelfStack(code, order, 2)) {
+            if(code.get(5).equals("offset")) {
+                if (!fieldMap.containsKey("array")) {
+                    return;
+                } else {
+                    fieldMap.put("offset", "temp");
+                    tempList.add("emmmmm");
+                    fieldMap.put("offset" + "temp", tempList.size() - 1 + "");
+                    int indexL = indexOfStack(code.get(4));
+                    codeList.add("t" + (tempList.size() - 1) + " = "
+                            + "t" + lrStack.get(indexL).fieldMap.get("offsettemp"));
+                    codeList.add("=", "t" + lrStack.get(indexL).fieldMap.get("offsettemp")
+                            , null, "t" + (tempList.size() - 1));
+                }
+            } else if(isSelfStack(code, order, 2)) {
                 String first = fieldMap.get(code.get(3));
                 String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
+                if(code.get(3).equals("array")){
+                    first = fieldMap.get("addr");
+                }
+                if(first.equals("temp")) {
+                    first = "t" + fieldMap.get(code.get(3)+"temp");
+                }
+                if(second.equals("temp")) {
+                    second = "t" + getFromStack(code.get(5) + "temp", indexOfStack(code.get(4)));
+                }
                 codeList.add(first + " = " + second);
                 codeList.add("=", second, null, first);
             }else if (isSelfStack(code, order, 4)) {
                 String second = fieldMap.get(code.get(5));
                 String first = getFromStack(code.get(3), indexOfStack(code.get(2)));
+                if(first.equals("temp")) {
+                    first = "t" + getFromStack(code.get(3) + "temp", indexOfStack(code.get(2)));
+                }
+                if(second.equals("temp")) {
+                    second = "t" + fieldMap.get(code.get(5)+"temp");
+                }
                 codeList.add(first + " = " + second);
                 codeList.add("=", second, null, first);
             } else if (code.get(2).equals("id")) {
@@ -225,8 +312,41 @@ public class LRStack {
             } else {
                 String first = getFromStack(code.get(3), indexOfStack(code.get(2)));
                 String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
+                if(code.get(3).equals("array")){
+                    first = getFromStack("addr", indexOfStack(code.get(2)));
+                }
+                if(first.equals("temp")) {
+                    first = "t" + getFromStack(code.get(3) + "temp", indexOfStack(code.get(2)));
+                }
+                if(second.equals("temp")) {
+                    second = "t" + getFromStack(code.get(5) + "temp", indexOfStack(code.get(4)));
+                }
                 codeList.add(first + " = " + second);
                 codeList.add("=", second, null, first);
+            }
+        } else if(code.size() == 9) {
+            if(code.get(6).equals("*") && code.get(8).equals("typewidth")) {
+                int indexE = indexOfStack("E");
+                String StringE = lrStack.get(indexE).fieldMap.get("addr");
+                String typeWidth = typewidth(indexOfStack("M14"));
+                String t = fieldMap.get("temp");
+                codeList.add("t"+t + " = " + StringE + " * " + typeWidth);
+                codeList.add("=", StringE, typeWidth, "t"+t);
+            }
+        } else if(code.size() == 10) {
+            if(code.get(3).equals("offset") && code.get(6).equals("offset")) {
+                String offsetL = "t" + fieldMap.get("offsettemp");
+                String tempt = "t" + fieldMap.get("temp");
+                int indexSub = indexOfStack("M14");
+                if(!lrStack.get(indexSub).fieldMap.containsKey("array")) {
+                    codeList.add(offsetL + " = " + getFromStack(
+                            "offset", indexSub) +  tempt);
+                    codeList.add("=", tempt, getFromStack("offset", indexSub), offsetL);
+                    return;
+                }
+                String offsetM = "t" + getFromStack("offsettemp", indexSub);
+                codeList.add(offsetL + " = " + offsetM + " + " + tempt);
+                codeList.add("+", offsetM, tempt, offsetL);
             }
         }
     }
