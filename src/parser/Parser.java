@@ -54,6 +54,7 @@ public class Parser {
             System.out.println("tokenIndex: " + tokenIndex);
             System.out.println("semantic or not: " + semanticOrNot);
             System.out.println("semantic order: " + semanticOrder);
+            stack.codeList.printCode();
             System.out.println();
 
             //当出错的时候
@@ -149,6 +150,8 @@ public class Parser {
                 ww.line = line;
                 firstNode = new Node(ww, new LinkedList<>());
                 firstNode.nodeSet.add(stack.lrStack.peek().element);
+                stack.codeList.add("exit");
+                stack.codeList.add("exit", null, null, null);
                 break;
             }
 //            System.out.println("status after: " + stack.peek().status);

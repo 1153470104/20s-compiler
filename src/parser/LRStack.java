@@ -376,7 +376,14 @@ public class LRStack {
         }
     }
     public void genIfGoto(List<String> code, Map<String, String> fieldMap, int order) {
-
+        int index1 = indexOfStack("E", 2);
+        String addr1 = "t" + getFromStack("addrtemp", index1);
+        int index2 = indexOfStack("E", 1);
+        String addr2 = "t" + getFromStack("addrtemp", index2);
+        int indexR = indexOfStack("relop");
+        String relop = lrStack.get(indexR).element.nodeSet.get(0).nodeSymbol.element();
+        codeList.add("if " + addr1 + " " + relop + " " + addr2 + " goto");
+        codeList.add("j"+relop, addr1, addr2, null);
     }
 
 
@@ -390,6 +397,10 @@ public class LRStack {
                 break;
             case "ifgoto":
                 genIfGoto(code, fieldMap, order);
+                break;
+            case "exit":
+                codeList.add("exit");
+                codeList.add("exit", null, null, null);
                 break;
         }
 

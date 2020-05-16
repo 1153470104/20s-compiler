@@ -1,7 +1,8 @@
+gen exit
 
 
-
-
+value P nextlist P 1 nextlist | back S nextlist M17 quad
+value M17 quad nextquad
 
 
 enter id T offset | offset T width
@@ -53,11 +54,11 @@ value L' offset Integer 0
 value B truelist B' truelist | value B falselist B' falselist
 back H 2 falselist M15 quad | merge B' truelist H 2 truelist H 1 truelist | value B' falselist H 1 falselist
 value M15 quad nextquad
-value B' truelist H truelist | value B' falselist H truelist
+value B' truelist H truelist | value B' falselist H falselist
 value H truelist H' truelist | value H falselist H' falselist
 back I 2 truelist M16 quad | merge H' falselist I 2 falselist I 1 falselist | value H' truelist I 1 truelist
 value M16 quad nextquad
-value H' truelist I truelist | value H' falselist I truelist
+value H' truelist I truelist | value H' falselist I falselist
 value I truelist B falselist | value I falselist B truelist
 value I truelist B truelist | value I falselist B falselist
 value I truelist makelist nextquad | value I falselist makelist nextquadplus | gen ifgoto E 2 addr relop E 1 addr | gen goto null

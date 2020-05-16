@@ -1,8 +1,7 @@
 Program P
 P M1 D P
 M1 empty
-P S M17 P
-M17 empty
+P S P
 P empty
 D T id M2 A ;
 M2 empty

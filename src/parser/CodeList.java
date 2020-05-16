@@ -48,8 +48,9 @@ public class CodeList {
     public void printCode() {
         System.out.println("The Code:");
         for(int i = 0; i < codelist.size(); i++) {
+            System.out.print(i + ":\t\t");
             System.out.print(codelist.get(i).code);
-            System.out.print("\t\t");
+            System.out.print("\t\t\t");
             StringBuilder sb = new StringBuilder();
             sb.append("[");
             for(String s: quanternary.get(i)) {

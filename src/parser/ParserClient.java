@@ -115,5 +115,6 @@ public class ParserClient {
 //        testAnalyse("./src/parser/test/define.txt");
 //        testAnalyse("./src/parser/test/assignment.txt");
         testAnalyse("./src/parser/test/condition.txt");
+//        testAnalyse("./src/parser/test/all.txt");
     }
 }
