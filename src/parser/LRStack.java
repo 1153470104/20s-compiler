@@ -17,6 +17,7 @@ public class LRStack {
     public List<String> tempList = new LinkedList<>();
     String w, t;
     int offset = 0;
+    public List<List<Integer>> jumplist = new LinkedList<>();
 
     public LRStack() throws FileNotFoundException {
     }
@@ -57,7 +58,7 @@ public class LRStack {
     }
     public int indexOfStack(String s, int count) {
         int a = 0;
-        for(int i = 0; i < lrStack.size(); i++) {
+        for(int i = lrStack.size() ; i > 0; i--) {
             if((lrStack.get(i).element.nodeSymbol).element().equals(s)){
                 a++;
                 if(a == count) {
@@ -109,38 +110,48 @@ public class LRStack {
                 fieldMap.put(code.get(2), "temp");
                 tempList.add("doesn't matter");
                 fieldMap.put(code.get(2) + "temp", (tempList.size() - 1) + "");
+            } else if(code.get(3).equals("nextquad")) {
+                fieldMap.put("quad", codeList.codelist.size()+"");
             }
         } else if(code.size() == 5) {
-            if(code.get(3).equals("lookup")){
+            if (code.get(3).equals("lookup")) {
                 //这里可能会有先后顺序的问题！！到底是哪个id
-                String id = ((Word)lrStack.get(indexOfStack("id")).element.nodeSymbol).lexeme;
+                String id = ((Word) lrStack.get(indexOfStack("id")).element.nodeSymbol).lexeme;
                 int indexId = signList.lookup(id);
-                if(indexId == -1) {
+                if (indexId == -1) {
                     semanticErrors.errors.add(
                             new Errors.ErrorInfo(lrStack.peek().element.nodeSymbol.line
-                            , "Variable usage with out been declared"));
+                                    , "Variable usage with out been declared"));
                     return;
                 }
                 StackUnit stack = signList.symbolEntryList.get(indexId).type;
-                if(stack.fieldMap.containsKey("array")) {
+                if (stack.fieldMap.containsKey("array")) {
                     fieldMap.put("array", stack.fieldMap.get("array"));
                     int i = 1;
-                    while(stack.fieldMap.containsKey("array"+i)) {
-                        fieldMap.put("array"+i, stack.fieldMap.get("array"+i));
+                    while (stack.fieldMap.containsKey("array" + i)) {
+                        fieldMap.put("array" + i, stack.fieldMap.get("array" + i));
                         i++;
                     }
                 }
                 fieldMap.put("type", stack.fieldMap.get("type"));
                 fieldMap.put("addr", id);
-
-            } else if(code.get(3).equals("num") || code.get(3).equals("digit")) {
-                fieldMap.put("addr", ((Num)lrStack.get(
+            } else if (code.get(3).equals("makelist")) {
+                int i = 0;
+                if (code.get(4).equals("nextquadplus")) {
+                    i = 1;
+                }
+                fieldMap.put(code.get(2), jumplist.size() + "");
+                List<Integer> list = new LinkedList<>();
+                list.add(codeList.lineNumber() + i);
+                jumplist.add(list);
+            } else if (code.get(3).equals("num") || code.get(3).equals("digit")) {
+                fieldMap.put("addr", ((Num) lrStack.get(
                         indexOfStack(code.get(3))).element.nodeSymbol).value + "");
                 System.out.println("---------------------- the things: " + fieldMap.get("addr"));
             } else if (code.get(3).equals("Integer") || code.get(3).equals("String")) {
                 int firstIndex = -1;
                 boolean firstself = code.get(1).equals(semantic.syntaxList.get(order).get(0));
-                if(firstself) {
+                if (firstself) {
                     fieldMap.put(code.get(2), code.get(4));
                 } else {
                     firstIndex = indexOfStack(code.get(1));
@@ -149,16 +160,16 @@ public class LRStack {
             } else if (code.get(3).equals("temp")) {
                 int firstIndex = -1;
                 boolean firstself = code.get(1).equals(semantic.syntaxList.get(order).get(0));
-                if(firstself) {
-                    if(code.get(4).equals("t"))
+                if (firstself) {
+                    if (code.get(4).equals("t"))
                         fieldMap.put(code.get(2), t);
-                    if(code.get(4).equals("w"))
+                    if (code.get(4).equals("w"))
                         fieldMap.put(code.get(2), w);
                 } else {
                     firstIndex = indexOfStack(code.get(1));
-                    if(code.get(4).equals("t"))
+                    if (code.get(4).equals("t"))
                         lrStack.get(firstIndex).fieldMap.put(code.get(2), t);
-                    if(code.get(4).equals("w"))
+                    if (code.get(4).equals("w"))
                         lrStack.get(firstIndex).fieldMap.put(code.get(2), w);
                 }
 
@@ -178,35 +189,39 @@ public class LRStack {
                     if (code.get(2).equals("w"))
                         w = lrStack.get(secondIndex).fieldMap.get(code.get(4));
                 }
-            } else if(code.get(4).equals("subtype")) {
-                if(code.get(1).equals("M13")) {
+            } else if (code.get(4).equals("subtype")) {
+                if (code.get(1).equals("M13")) {
                     int i = 1;
-                    while(fieldMap.containsKey("array"+i)) {
+                    while (fieldMap.containsKey("array" + i)) {
                         i++;
                     }
                     i = i - 1;
-                    String array = fieldMap.get("array"+i);
-                    fieldMap.remove("array"+i);
-                    if(i != 0)
+                    String array = fieldMap.get("array" + i);
+                    fieldMap.remove("array" + i);
+                    if (i != 0)
                         fieldMap.put("array", array);
-                } else if(code.get(1).equals("M14")) {
+                } else if (code.get(1).equals("M14")) {
                     int indexL = indexOfStack("[") - 1;
                     Map<String, String> map = lrStack.get(indexL).fieldMap;
                     fieldMap.put("type", map.get("type"));
                     int i = 1;
-                    while(map.containsKey("array"+i)) {
-                        fieldMap.put("array"+i, map.get("array"+i));
+                    while (map.containsKey("array" + i)) {
+                        fieldMap.put("array" + i, map.get("array" + i));
                         i++;
                     }
                     i = i - 1;
-                    String array = fieldMap.get("array"+i);
-                    fieldMap.remove("array"+i);
-                    if(array!=null)
+                    String array = fieldMap.get("array" + i);
+                    fieldMap.remove("array" + i);
+                    if (array != null)
                         fieldMap.put("array", array);
                 }
             } else {
                 valuePut(code, fieldMap, order);
             }
+        } else if(code.size() == 6) {
+            int index = indexOfStack(code.get(3));
+            fieldMap.put(code.get(2), getFromStack(code.get(5), index));
+
         } else if(code.size() == 8) {
             //still with only situation
             int c1 = indexOfStack("C");
@@ -355,6 +370,10 @@ public class LRStack {
     }
 
     public void genGoto(List<String> code, Map<String, String> fieldMap, int order) {
+        if(code.get(2).equals("null")){
+            codeList.add("goto");
+            codeList.add("j", null, null, null);
+        }
     }
     public void genIfGoto(List<String> code, Map<String, String> fieldMap, int order) {
 
@@ -383,7 +402,69 @@ public class LRStack {
                 , lrStack.get(index), offset);
     }
 
-    public Map<String, String> doSemantic(int order) {
+    public void back(List<String> code, Map<String, String> fieldMap, int order) {
+        if(code.size() == 5) {
+            int indexQuad = indexOfStack(code.get(3));
+            String codeNum = getFromStack("quad", indexQuad);
+            int indexB = indexOfStack(code.get(1));
+            String tempContent = getFromStack(code.get(2), indexB);
+            if(tempContent == null) {
+                return;
+            } else {
+                int listNum = Integer.parseInt(tempContent);
+                List<Integer> list = jumplist.get(listNum);
+                for (Integer i : list) {
+                    codeList.append(codeNum, i);
+                }
+            }
+        } else if(code.size() == 6) {
+            int indexQuad = indexOfStack(code.get(4));
+            String codeNum = getFromStack("quad", indexQuad);
+            int indexB = indexOfStack(code.get(1), Integer.parseInt(code.get(2)));
+            String tempContent= getFromStack(code.get(3), indexB);
+            if(tempContent == null) {
+                return;
+            } else {
+                int listNum = Integer.parseInt(tempContent);
+                List<Integer> list = jumplist.get(listNum);
+                for (Integer i : list) {
+                    codeList.append(codeNum, i);
+                }
+            }
+        }
+    }
+
+    public void merge(List<String> code, Map<String, String> fieldMap, int order) {
+        if(code.size()==11) {
+            int index1 = indexOfStack("S", 2);
+            int list1 = Integer.parseInt(getFromStack("nextlist", index1));
+            int index2 = indexOfStack("S", 1);
+            int list2 = Integer.parseInt(getFromStack("nextlist", index2));
+            int index3 = indexOfStack("N1");
+            int list3 = Integer.parseInt(getFromStack("nextlist", index3));
+
+            fieldMap.put(code.get(2), jumplist.size()+"");
+            List<Integer> list = new LinkedList<>();
+            list.addAll(jumplist.get(list1));
+            list.addAll(jumplist.get(list2));
+            list.addAll(jumplist.get(list3));
+            jumplist.add(list);
+
+        } else if(code.size() == 9) {
+            int index1 = indexOfStack(code.get(3), 2);
+            int list1 = Integer.parseInt(getFromStack(code.get(5), index1));
+            int index2 = indexOfStack(code.get(6), 1);
+            int list2 = Integer.parseInt(getFromStack(code.get(8), index2));
+            fieldMap.put(code.get(2), jumplist.size()+"");
+            List<Integer> list = new LinkedList<>();
+            list.addAll(jumplist.get(list1));
+            list.addAll(jumplist.get(list2));
+            jumplist.add(list);
+
+        }
+
+    }
+        public Map<String, String> doSemantic(int order) {
         List<List<String>> semanticCode = semantic.semanticList.get(order);
         Map<String, String> fieldMap = new HashMap<>();
 
@@ -410,8 +491,10 @@ public class LRStack {
                     value(code, fieldMap, order);
                     break;
                 case "merge":
+                    merge(code, fieldMap, order);
                     break;
                 case "back":
+                    back(code, fieldMap, order);
                     break;
                 case "gen":
                     generate(code, fieldMap, order);

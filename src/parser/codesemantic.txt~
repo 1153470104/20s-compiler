@@ -26,7 +26,7 @@ enter id X offset | offset X offset
 value C type array num C 1 type | value C width num val multi C 1 width
 value C type temp t | value C width temp w
 gen = L array E addr
-back B truelist M9 quad | back B falselist M10 quad | merge S nextlist S 1 nextlist N nextlist | merge S nextlist S nextlist S 2 nextlist
+back B truelist M9 quad | back B falselist M10 quad | merge S nextlist S 2 nextlist N1 nextlist S 1 nextlist
 value N nextlist makelist nextquad | gen goto null
 value M9 quad nextquad
 value M10 quad nextquad
@@ -45,22 +45,22 @@ value F val num val
 value F val digit val
 value E addr newtemp | gen = E addr L addr
 value L array lookup id | gen = L offset L' offset
-value M13 array lookup id | value M13 type M13 type
+value M13 array lookup id
 value temp t newtemp | gen = temp t E addr * L' typewidth | value L' offset newtemp | gen = L' offset L' 1 offset + temp t
 value M14 type L' subtype
 value L' offset Integer 0
 
-
-back H 1 falselist M15 quad | merge B truelist H 1 truelist H 2 truelist | value B falselist H 2 falselist
+value B truelist B' truelist | value B falselist B' falselist
+back H 2 falselist M15 quad | merge B' truelist H 2 truelist H 1 truelist | value B' falselist H 1 falselist
 value M15 quad nextquad
-
-
-back I 1 truelist M16 quad | merge H falselist I 1 falselist I 2 falselist | value H truelist I 2 truelist
+value B' truelist H truelist | value B' falselist H truelist
+value H truelist H' truelist | value H falselist H' falselist
+back I 2 truelist M16 quad | merge H' falselist I 2 falselist I 1 falselist | value H' truelist I 1 truelist
 value M16 quad nextquad
-
+value H' truelist I truelist | value H' falselist I truelist
 value I truelist B falselist | value I falselist B truelist
 value I truelist B truelist | value I falselist B falselist
-value I truelist makelist nextquad | value I falselist makelist nextquadplus | gen ifgoto E 1 addr relop E 2 addr | gen goto null
+value I truelist makelist nextquad | value I falselist makelist nextquadplus | gen ifgoto E 2 addr relop E 1 addr | gen goto null
 value I truelist makelist nextquad | gen goto null
 value I falselist makelist nextquad | gen goto null
 

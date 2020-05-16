@@ -14,6 +14,12 @@ public class CodeList {
 
     }
 
+    public void append(String content, int index) {
+        codelist.get(index).code = codelist.get(index).code + content;
+        quanternary.get(index).remove(3);
+        quanternary.get(index).add(content);
+    }
+
     public void add(String a, String b, String c, String d) {
         List<String> s = new LinkedList<>();
         s.add(a); s.add(b); s.add(c); s.add(d);
