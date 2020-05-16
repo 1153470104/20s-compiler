@@ -58,7 +58,7 @@ public class LRStack {
     }
     public int indexOfStack(String s, int count) {
         int a = 0;
-        for(int i = lrStack.size() ; i > 0; i--) {
+        for(int i = lrStack.size()-1 ; i > 0; i--) {
             if((lrStack.get(i).element.nodeSymbol).element().equals(s)){
                 a++;
                 if(a == count) {
@@ -436,29 +436,45 @@ public class LRStack {
 
     public void merge(List<String> code, Map<String, String> fieldMap, int order) {
         if(code.size()==11) {
-            int index1 = indexOfStack("S", 2);
-            int list1 = Integer.parseInt(getFromStack("nextlist", index1));
-            int index2 = indexOfStack("S", 1);
-            int list2 = Integer.parseInt(getFromStack("nextlist", index2));
-            int index3 = indexOfStack("N1");
-            int list3 = Integer.parseInt(getFromStack("nextlist", index3));
-
             fieldMap.put(code.get(2), jumplist.size()+"");
             List<Integer> list = new LinkedList<>();
-            list.addAll(jumplist.get(list1));
-            list.addAll(jumplist.get(list2));
-            list.addAll(jumplist.get(list3));
+
+            int index1 = indexOfStack("S", 1);
+            String int1 = getFromStack("nextlist", index1);
+            if(int1!=null) {
+                int list1 = Integer.parseInt(int1);
+                list.addAll(jumplist.get(list1));
+            }
+            int index2 = indexOfStack("S", 2);
+            String int2 = getFromStack("nextlist", index2);
+            if(int2!=null) {
+                int list2 = Integer.parseInt(int2);
+                list.addAll(jumplist.get(list2));
+            }
+            int index3 = indexOfStack("N1");
+            String int3 = getFromStack("nextlist", index3);
+            if(int3!=null) {
+                int list3 = Integer.parseInt(int3);
+                list.addAll(jumplist.get(list3));
+            }
             jumplist.add(list);
 
         } else if(code.size() == 9) {
-            int index1 = indexOfStack(code.get(3), 2);
-            int list1 = Integer.parseInt(getFromStack(code.get(5), index1));
-            int index2 = indexOfStack(code.get(6), 1);
-            int list2 = Integer.parseInt(getFromStack(code.get(8), index2));
             fieldMap.put(code.get(2), jumplist.size()+"");
             List<Integer> list = new LinkedList<>();
-            list.addAll(jumplist.get(list1));
-            list.addAll(jumplist.get(list2));
+
+            int index1 = indexOfStack(code.get(3), 2);
+            String int1 = getFromStack(code.get(5), index1);
+            if(int1!=null) {
+                int list1 = Integer.parseInt(int1);
+                list.addAll(jumplist.get(list1));
+            }
+            int index2 = indexOfStack(code.get(6), 1);
+            String int2 = getFromStack(code.get(8), index2);
+            if(int2!=null) {
+                int list2 = Integer.parseInt(int2);
+                list.addAll(jumplist.get(list2));
+            }
             jumplist.add(list);
 
         }

@@ -78,6 +78,7 @@ public class Parser {
                 tokenIndex += 1;
                 temp = getTokenToNode(inputList, tokenIndex);
                 line = temp.nodeSymbol.line;
+                System.out.println("#######################really: " + temp.nodeSymbol.element());
                 indexOfPeek = symbolList.indexOf(temp.nodeSymbol.element());
                 operation = analysisChart[stack.lrStack.peek().status][indexOfPeek];
 

@@ -15,7 +15,7 @@ public class CodeList {
     }
 
     public void append(String content, int index) {
-        codelist.get(index).code = codelist.get(index).code + content;
+        codelist.get(index).code = codelist.get(index).code + " " + content;
         quanternary.get(index).remove(3);
         quanternary.get(index).add(content);
     }
@@ -50,7 +50,19 @@ public class CodeList {
         for(int i = 0; i < codelist.size(); i++) {
             System.out.print(codelist.get(i).code);
             System.out.print("\t\t");
-            System.out.println(Arrays.toString(quanternary.get(i).toArray()));
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for(String s: quanternary.get(i)) {
+                if(s != null) {
+                    sb.append(" " + s + ",");
+                }
+                if(s == null) {
+                    sb.append(" -,");
+                }
+            }
+            sb.deleteCharAt(sb.length()-1);
+            sb.append(" ]");
+            System.out.println(sb.toString());
         }
     }
 }
