@@ -6,7 +6,7 @@ M17 empty
 P empty
 D T id M2 A ;
 M2 empty
-D proc X M3 id ( M ) { P }
+D proc X id M3 ( M ) { P }
 M3 empty
 D record id M4 { P }
 M4 empty

@@ -2,3 +2,4 @@ float[4][2][8][100] x;
 float b;
 int a = 0;
 int c, d;
+proc int x(int r, int g) { int y; }

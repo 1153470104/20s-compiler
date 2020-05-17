@@ -1,3 +1,7 @@
-c = 1;
+c = 1;      /*未经声明*/
 int a , b;
-float b;
+float b;    /* 重复声明 */
+a = 0;
+float c;
+c = a;      /*运算分量不匹配*/
+

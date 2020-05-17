@@ -36,6 +36,9 @@ public class LRStack {
         public Node element;
         public Map<String, String> fieldMap = new HashMap<>();
 
+        public StackUnit() {
+        }
+
         public StackUnit(int status, Node element) {
             this.status = status;
             this.element = element;
@@ -90,6 +93,9 @@ public class LRStack {
                         i++;
                     }
                 }
+            }
+            if(code.get(4).equals("addr")) {
+                fieldMap.put("type", getFromStack("type", secondIndex));
             }
         } else if (secondelf) {
             firstIndex = indexOfStack(code.get(1));
@@ -332,11 +338,18 @@ public class LRStack {
                 codeList.add(first + " = " + second);
                 codeList.add("=", second, null, first);
             } else {
-                String first = getFromStack(code.get(3), indexOfStack(code.get(2)));
-                String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
+                int index1 =indexOfStack(code.get(2)) ;
+                int index2 = indexOfStack(code.get(4));
+                String first = getFromStack(code.get(3), index1);
+                String second = getFromStack(code.get(5), index2);
                 if(getFromStack("lookup", indexOfStack(code.get(2))) != null) {
                     return;
                 }
+//                if(!getFromStack("type", index1).equals(getFromStack("type", index2))) {
+//                    semanticErrors.addS(new Errors.ErrorInfo(lrStack.peek().element.nodeSymbol.line
+//                            , "Unmatched operational components"));
+//                    return;
+//                }
                 if(code.get(3).equals("array")){
                     first = getFromStack("addr", indexOfStack(code.get(2)));
                 }
@@ -346,8 +359,14 @@ public class LRStack {
                 if(second.equals("temp")) {
                     second = "t" + getFromStack(code.get(5) + "temp", indexOfStack(code.get(4)));
                 }
-                codeList.add(first + " = " + second);
-                codeList.add("=", second, null, first);
+                if(getFromStack("offsettemp", index1)!=null) {
+                    codeList.add(first + " [ " + "t" + getFromStack("offsettemp", index1) +  " ] = " + second);
+                    codeList.add("[]=", second, null, first + "["
+                            + "t" + getFromStack("offsettemp", index1) + "]" );
+                } else {
+                    codeList.add(first + " = " + second);
+                    codeList.add("=", second, null, first);
+                }
             }
         } else if(code.size() == 9) {
             if(code.get(6).equals("*") && code.get(8).equals("typewidth")) {
@@ -446,6 +465,16 @@ public class LRStack {
         if(signList.contain(id)) {
             semanticErrors.addS(new Errors.ErrorInfo(lrStack.peek().element.nodeSymbol.line
                     , "Duplicate declaration of an existed variable \"" + id + "\""));
+            return;
+        }
+        if(code.get(2).equals("proc")) {
+            StackUnit proc = new StackUnit();
+            proc.fieldMap.put("type", "proc");
+            signList.enter(id, proc, offset);
+        }else if(code.get(2).equals("record")) {
+            StackUnit record = new StackUnit();
+            record.fieldMap.put("type", "record");
+            signList.enter(id, record, offset);
         }
         signList.enter(id, lrStack.get(index), offset);
     }
@@ -528,43 +557,44 @@ public class LRStack {
         }
 
     }
-        public Map<String, String> doSemantic(int order) {
-        List<List<String>> semanticCode = semantic.semanticList.get(order);
-        Map<String, String> fieldMap = new HashMap<>();
+
+    public Map<String, String> doSemantic(int order) {
+    List<List<String>> semanticCode = semantic.semanticList.get(order);
+    Map<String, String> fieldMap = new HashMap<>();
 
 //        System.out.println("before!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        if(semanticCode.size() == 1 && semanticCode.get(0).size() == 0) {
-            System.out.println(Arrays.toString(semanticCode.get(0).toArray()));
-            return fieldMap;
-        }
-//        System.out.println("after!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        for (List<String> code : semanticCode) {
-            System.out.println("the code: " + Arrays.toString(code.toArray()));
-            switch (code.get(0)) {
-                case "enter":
-//                    System.out.println("here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    enter(code);
-                    break;
-                case "offset":
-                    int firstIndex = indexOfStack(code.get(1));
-                    int width = Integer.parseInt(lrStack.get(
-                            firstIndex).fieldMap.get(code.get(2)));
-                    offset = offset + width;
-                    break;
-                case "value":
-                    value(code, fieldMap, order);
-                    break;
-                case "merge":
-                    merge(code, fieldMap, order);
-                    break;
-                case "back":
-                    back(code, fieldMap, order);
-                    break;
-                case "gen":
-                    generate(code, fieldMap, order);
-                    break;
-            }
-        }
+    if(semanticCode.size() == 1 && semanticCode.get(0).size() == 0) {
+        System.out.println(Arrays.toString(semanticCode.get(0).toArray()));
         return fieldMap;
     }
+//        System.out.println("after!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    for (List<String> code : semanticCode) {
+        System.out.println("the code: " + Arrays.toString(code.toArray()));
+        switch (code.get(0)) {
+            case "enter":
+//                    System.out.println("here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                enter(code);
+                break;
+            case "offset":
+                int firstIndex = indexOfStack(code.get(1));
+                int width = Integer.parseInt(lrStack.get(
+                        firstIndex).fieldMap.get(code.get(2)));
+                offset = offset + width;
+                break;
+            case "value":
+                value(code, fieldMap, order);
+                break;
+            case "merge":
+                merge(code, fieldMap, order);
+                break;
+            case "back":
+                back(code, fieldMap, order);
+                break;
+            case "gen":
+                generate(code, fieldMap, order);
+                break;
+        }
+    }
+    return fieldMap;
+}
 }

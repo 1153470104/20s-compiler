@@ -19,10 +19,10 @@ value temp t X type | value temp w X width
 value X type String int | value X width Integer 4
 value X type String float | value X width Integer 8
 
-enter id X offset | offset X offset
+enter id X offset | offset X width
 
 
-enter id X offset | offset X offset
+enter id X offset | offset X width
 
 value C type array num C 1 type | value C width num val multi C 1 width
 value C type temp t | value C width temp w
@@ -42,8 +42,8 @@ value G' addr F addr
 
 value F addr E addr
 value F addr lookup id
-value F val num val
-value F val digit val
+value F val num val | value F type String int
+value F val digit val | value F type String float
 value E addr newtemp | gen = E addr L addr
 value L array lookup id | gen = L offset L' offset
 value M13 array lookup id
