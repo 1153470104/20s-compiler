@@ -11,6 +11,15 @@ public class SignList {
     public SignList(){
     }
 
+    public boolean contain(String id) {
+        for(SymbolEntry s: symbolEntryList) {
+            if(id.equals(s.lexeme)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void printSignList() {
         System.out.println("signlist: ");
         for(SymbolEntry s: symbolEntryList) {

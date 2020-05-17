@@ -3,6 +3,7 @@ package parser;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class Errors {
 
@@ -25,6 +26,13 @@ public class Errors {
     public Errors(){};
     public Errors(List<String> symbolList) {
         this.symbolList = symbolList;
+    }
+
+    public void addS(ErrorInfo e) {
+        if(errors.contains(e)) {
+            return;
+        }
+        errors.add(e);
     }
 
     public int existCount(int row, int[][] chart) {
@@ -191,6 +199,20 @@ public class Errors {
     static class ErrorInfo {
         public int line;
         public String errorInfo;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof ErrorInfo)) return false;
+            ErrorInfo errorInfo1 = (ErrorInfo) o;
+            return line == errorInfo1.line &&
+                    Objects.equals(errorInfo, errorInfo1.errorInfo);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(line, errorInfo);
+        }
 
         public ErrorInfo(int line, String errorInfo) {
             this.line = line;

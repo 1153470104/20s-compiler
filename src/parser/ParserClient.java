@@ -91,7 +91,10 @@ public class ParserClient {
 
         p.analyse(l1.tokens);
         p.firstNode.printNode(0);
+        System.out.print("Syntax ");
         p.errors.errorPrint();
+        System.out.print("Semantic ");
+        p.stack.semanticErrors.errorPrint();
         p.stack.signList.printSignList();
         p.stack.codeList.printCode();
     }
@@ -115,6 +118,7 @@ public class ParserClient {
 //        testAnalyse("./src/parser/test/define.txt");
 //        testAnalyse("./src/parser/test/assignment.txt");
         testAnalyse("./src/parser/test/condition.txt");
+//        testAnalyse("./src/parser/test/error.txt");
 //        testAnalyse("./src/parser/test/all.txt");
     }
 }

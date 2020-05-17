@@ -13,7 +13,7 @@ public class LRStack {
     //semantic structure
     public CodeList codeList = new CodeList();
     public SignList signList = new SignList();
-    public Errors semanticErrors;
+    public Errors semanticErrors = new Errors();
     public List<String> tempList = new LinkedList<>();
     String w, t;
     int offset = 0;
@@ -119,9 +119,11 @@ public class LRStack {
                 String id = ((Word) lrStack.get(indexOfStack("id")).element.nodeSymbol).lexeme;
                 int indexId = signList.lookup(id);
                 if (indexId == -1) {
-                    semanticErrors.errors.add(
+                    System.out.println("this is an error!!!!!!!!!!!!!!!!!");
+                    semanticErrors.addS(
                             new Errors.ErrorInfo(lrStack.peek().element.nodeSymbol.line
-                                    , "Variable usage with out been declared"));
+                                    , "Variable \"" + id + "\" usage with out been declared"));
+                    fieldMap.put("lookup", "fail");
                     return;
                 }
                 StackUnit stack = signList.symbolEntryList.get(indexId).type;
@@ -327,6 +329,9 @@ public class LRStack {
             } else {
                 String first = getFromStack(code.get(3), indexOfStack(code.get(2)));
                 String second = getFromStack(code.get(5), indexOfStack(code.get(4)));
+                if(getFromStack("lookup", indexOfStack(code.get(2))) != null) {
+                    return;
+                }
                 if(code.get(3).equals("array")){
                     first = getFromStack("addr", indexOfStack(code.get(2)));
                 }
@@ -349,6 +354,25 @@ public class LRStack {
                 String t = fieldMap.get("temp");
                 codeList.add("t"+t + " = " + StringE + " * " + typeWidth);
                 codeList.add("=", StringE, typeWidth, "t"+t);
+            } else {
+                String result = "t" + fieldMap.get("addrtemp");
+                int index1 = indexOfStack(code.get(4));
+                String content1 = getFromStack(code.get(5), index1);
+                int index2 = indexOfStack(code.get(7));
+                String content2 = getFromStack(code.get(8), index2);
+                if(content2.equals("temp")) {
+                    content2 = getFromStack(code.get(8) + "temp", index2);
+                }
+                if(content1 == null) {
+                    codeList.add(result + " = " + content2);
+                    codeList.add("=", content2, null, result);
+                } else {
+                    if(content1.equals("temp")) {
+                        content1 = getFromStack(code.get(5) + "temp", index1);
+                    }
+                    codeList.add(result + " = " + content1 + " " + code.get(6) + " " + content2);
+                    codeList.add(code.get(6), content2, content1, result);
+                }
             }
         } else if(code.size() == 10) {
             if(code.get(3).equals("offset") && code.get(6).equals("offset")) {
@@ -386,7 +410,6 @@ public class LRStack {
         codeList.add("j"+relop, addr1, addr2, null);
     }
 
-
     public void generate(List<String> code, Map<String, String> fieldMap, int order) {
         switch (code.get(1)) {
             case "=":
@@ -409,8 +432,12 @@ public class LRStack {
     public void enter(List<String> code){
         int index = indexOfStack(code.get(2));
         int idIndex = indexOfStack("id");
-        signList.enter(((Word)lrStack.get(idIndex).element.nodeSymbol).lexeme
-                , lrStack.get(index), offset);
+        String id = ((Word)lrStack.get(idIndex).element.nodeSymbol).lexeme;
+        if(signList.contain(id)) {
+            semanticErrors.addS(new Errors.ErrorInfo(lrStack.peek().element.nodeSymbol.line
+                    , "Duplicate declaration of an existed variable \"" + id + "\""));
+        }
+        signList.enter(id, lrStack.get(index), offset);
     }
 
     public void back(List<String> code, Map<String, String> fieldMap, int order) {
