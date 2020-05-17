@@ -75,7 +75,12 @@ public class LRStack {
         boolean secondelf = code.get(3).equals(semantic.syntaxList.get(order).get(0));
         if(firstself) {
             secondIndex = indexOfStack(code.get(3));
-            fieldMap.put(code.get(2), lrStack.get(secondIndex).fieldMap.get(code.get(4)));
+            String content = lrStack.get(secondIndex).fieldMap.get(code.get(4));
+            fieldMap.put(code.get(2), content);
+            if(content.equals("temp")) {
+                String extra = lrStack.get(secondIndex).fieldMap.get(code.get(4) + "temp");
+                fieldMap.put(code.get(2) + "temp", extra);
+            }
             if(code.get(4).equals("type")) {
                 if(lrStack.get(secondIndex).fieldMap.containsKey("array")) {
                     fieldMap.put("array", getFromStack("array", secondIndex));
@@ -361,14 +366,14 @@ public class LRStack {
                 int index2 = indexOfStack(code.get(7));
                 String content2 = getFromStack(code.get(8), index2);
                 if(content2.equals("temp")) {
-                    content2 = getFromStack(code.get(8) + "temp", index2);
+                    content2 = "t" + getFromStack(code.get(8) + "temp", index2);
                 }
                 if(content1 == null) {
                     codeList.add(result + " = " + content2);
                     codeList.add("=", content2, null, result);
                 } else {
                     if(content1.equals("temp")) {
-                        content1 = getFromStack(code.get(5) + "temp", index1);
+                        content1 = "t" + getFromStack(code.get(5) + "temp", index1);
                     }
                     codeList.add(result + " = " + content1 + " " + code.get(6) + " " + content2);
                     codeList.add(code.get(6), content2, content1, result);
@@ -397,6 +402,11 @@ public class LRStack {
         if(code.get(2).equals("null")){
             codeList.add("goto");
             codeList.add("j", null, null, null);
+        } else {
+            int index = indexOfStack(code.get(2));
+            String content = getFromStack(code.get(3), index);
+            codeList.add("goto " + content);
+            codeList.add("j", null, null, content);
         }
     }
     public void genIfGoto(List<String> code, Map<String, String> fieldMap, int order) {
